@@ -1,19 +1,207 @@
 <html>
   <head>
-<style>
-
-</style>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js'></script>
+    <style>
+      * {
+        font-family: sans-serif;
+      }
+      div {
+        margin: 1rem;
+      }
+      .navBar {
+        display: flex;
+        flex-direction: column;
+        border: solid 1px rgb(241, 241, 241);
+        margin: 0;
+        margin-bottom: 1rem;
+        padding: 5px;
+      }
+      form {
+        border: solid 1px black;
+        display: flex;
+        flex-direction: column;
+      }
+      form > * {
+        width: auto;
+        margin: 1rem;
+        height: 2rem;
+        padding: 5px;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.0/react-router-dom.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.0/react-router-dom.js"></script>
   </head>
   <body>
-    <div id='root'></div>
-    <script type='text/babel'>
-      const root = document.querySelector('#root');
-      ReactDOM.render(<hr />, root);
+    <div id="root"></div>
+    <script type="text/babel">
+      const API = `https://acme-users-api-rev.herokuapp.com/api`;
+      const { render } = ReactDOM;
+      const { Component } = React;
+      const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM;
+      const fetchUser = async () => {
+        const storage = window.localStorage;
+        const userId = storage.getItem("userId");
+        if (userId) {
+          try {
+            return (await axios.get(`${API}/users/detail/${userId}`)).data;
+          } catch (ex) {
+            storage.removeItem("userId");
+            return fetchUser();
+          }
+        }
+        const user = (await axios.get(`${API}/users/random`)).data;
+        storage.setItem("userId", user.id);
+        return user;
+      };
+
+      const Nav = ({ path, bookmarks, categories }) => {
+        return (
+          <div className="navBar">
+            <h2>Categories</h2>
+            <nav>
+              {categories.map(category => {
+                return (
+                  <Link to={`/${category.name}`} className={path === `/${category.name}` ? "selected" : ""}>
+                    {category.name} ({category.amount})
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        );
+      };
+      //
+      //
+      //
+      class Form extends Component {
+        constructor() {
+          super();
+          this.state = {
+            text: "",
+            category: "",
+            error: ""
+          };
+          this.create = this.create.bind(this);
+        }
+        create() {
+          this.props
+            .create({ text: this.state.text, category: this.state.category })
+            .then(() => this.props.history.push(`/${this.state.category}`));
+          // .catch(ex => this.setState({ error: ex.response.data.message }));
+        }
+        render() {
+          const { text, category } = this.state;
+          const { create } = this;
+          return (
+            <form onSubmit={ev => ev.preventDefault()}>
+              {!!this.state.error && <div className="error">{error}</div>}
+              <input value={text} placeholder="Insert url" onChange={ev => this.setState({ text: ev.target.value })} />
+              <input value={category} placeholder="Insert category" onChange={ev => this.setState({ category: ev.target.value })} />
+              <button
+                disabled={!text || !category}
+                onClick={() => {
+                  console.log(this.props);
+                  console.log(this.state);
+                  create();
+                }}
+              >
+                Create
+              </button>
+            </form>
+          );
+        }
+      }
+      const Bookmarks = ({ bookmarks, category, destroy }) => {
+        return (
+          <ul>
+            {bookmarks
+              .filter(bookmark => bookmark.category === category)
+              .map((bookmark, idx) => {
+                <li key={idx}>
+                  {bookmark.text}
+                  <button className="destroyButton" onClick={() => destroy(bookmark)}>
+                    Destroy
+                  </button>
+                </li>;
+              })}
+          </ul>
+        );
+      };
+
+      class App extends Component {
+        constructor() {
+          super();
+          this.state = {
+            user: {},
+            bookmarks: [],
+            categories: []
+          };
+          this.create = this.create.bind(this);
+          this.destroy = this.destroy.bind(this);
+        }
+        async componentDidMount() {
+          const user = await fetchUser();
+          const bookmarks = (await axios.get(`${API}/users/${user.id}/bookmarks`)).data;
+          const categories = bookmarks.reduce((categories, bookmark) => {
+            if (categories[bookmark.category]) {
+              categories[bookmark.category].amount += 1;
+              return categories;
+            }
+            categories[bookmark.category].name = bookmark.category;
+            categories[bookmark.category].amount = 0;
+            return categories;
+          }, []);
+
+          this.setState({ user, bookmarks, categories });
+        }
+
+        async create({ text, category }) {
+          console.log(this.state);
+          const { user, bookmarks, categories } = this.state;
+          const bookmark = { text: text, category: category };
+          const newBookmark = (await axios.post(`${API}/users/${user.id}/bookmarks`, bookmark)).data;
+          const newCategory = { name: newBookmark.category, amount: 0 };
+          const newBookmarks = [...this.state.bookmarks, newBookmark];
+          this.setState({ newBookmarks });
+          if (this.state.categories[newCategory]) {
+            this.state.categories[newCategory].amount += 1;
+          } else {
+            this.state.categories[newCategory].push(newCategory);
+          }
+        }
+        async destroy() {}
+
+        render() {
+          const { user, bookmarks, categories } = this.state;
+          const { create, destroy } = this;
+          return (
+            <HashRouter>
+              <h1>
+                {user.fullName} ( {bookmarks.length} Bookmarks ){" "}
+              </h1>
+              <Nav path={location.pathname} bookmarks={bookmarks} categories={categories} />
+              <Form history={history} create={create} bookmarks={bookmarks} categories={categories} />
+              <Switch>
+                <Route
+                  path="/bookmarks/:category?"
+                  render={() => (
+                    <Bookmarks
+                      bookmarks={bookmarks}
+                      category={categories.filter(category => location.pathname.slice(1) === category.name)[0]}
+                      destroy={destroy}
+                    />
+                  )}
+                />
+              </Switch>
+            </HashRouter>
+          );
+        }
+      }
+
+      const root = document.querySelector("#root");
+      ReactDOM.render(<App />, root);
     </script>
   </body>
 </html>
