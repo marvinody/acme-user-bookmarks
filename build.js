@@ -65,11 +65,13 @@ const fetchUser = async ()=> {
          const {url, category} = this.state;
          console.log(url, category)
          if (url === '' && category === '') {
-            this.setState({notValid: true})
-            return window.alert('please enter an url and a category')
+            this.setState({notValid: true});
+            return;
+            // return window.alert('please enter an url and a category')
          } else if(url === '' || category === '') {
-            this.setState({notValid: true})
-            return window.alert('please check your form')
+            this.setState({notValid: true});
+            return;
+            // return window.alert('please check your form')
          }
 
          updateOnChange(url, category);
@@ -88,7 +90,7 @@ const fetchUser = async ()=> {
         //   console.log(category);  
           return(
             <form className="ui form" onSubmit={ e => { e.preventDefault(); e.target.reset();}}>
-            <p className="info"><i class="fas fa-keyboard"></i> Enter an url without the https:// and .com.</p>
+            <p className="info"><i className="fas fa-keyboard"></i> Enter an url without the https:// and .com.</p>
             <div className="field">
               <label className='hide'>url</label>
               <input className={notValid ? 'missingInfo' : null} type="text" name="url" placeholder='url' onChange={ (e)=> this.setState({ url: e.target.value})}/>

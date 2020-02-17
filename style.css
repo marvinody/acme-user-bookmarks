@@ -31,11 +31,14 @@ main {
 .item-parent {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     margin-top: 20px;
+    width: 90%;
 }
 
 .item-parent > div {
     margin-bottom: 10px !important;
+   
 }
 main > div {
     padding: 15px;
