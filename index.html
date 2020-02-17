@@ -29,7 +29,7 @@
         width: 100%;
         border-radius: 20px;
       }
-      ul > a {
+      ul > li {
         display: flex;
         margin: 1rem;
         justify-content: space-around;
@@ -128,28 +128,26 @@
         const {
           params: { filter }
         } = match;
-        if (bookmarks.length > 10) {
-          alert("Only 10 bookmarks allowed");
-        } else
-          return (
-            <ul>
-              {bookmarks
-                .filter(bookmark => bookmark.category === filter)
-                .map(bookmark => {
-                  return (
-                    <a className="urls" href={bookmark.url} key={bookmark.id}>
-                      {bookmark.url}
-                      <button
-                        className="destroy"
-                        onClick={() => destroy(bookmark)}
-                      >
-                        Destroy
-                      </button>
-                    </a>
-                  );
-                })}
-            </ul>
-          );
+
+        return (
+          <ul>
+            {bookmarks
+              .filter(bookmark => bookmark.category === filter)
+              .map(bookmark => {
+                return (
+                  <li className="urls" key={bookmark.id}>
+                    {bookmark.url}
+                    <button
+                      className="destroy"
+                      onClick={() => destroy(bookmark)}
+                    >
+                      Destroy
+                    </button>
+                  </li>
+                );
+              })}
+          </ul>
+        );
       };
 
       class FormInput extends Component {
