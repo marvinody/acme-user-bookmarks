@@ -88,6 +88,7 @@ const fetchUser = async ()=> {
         //   console.log(category);  
           return(
             <form className="ui form" onSubmit={ e => { e.preventDefault(); e.target.reset();}}>
+            <p className="info"><i class="fas fa-keyboard"></i> Enter an url without the https:// and .com.</p>
             <div className="field">
               <label className='hide'>url</label>
               <input className={notValid ? 'missingInfo' : null} type="text" name="url" placeholder='url' onChange={ (e)=> this.setState({ url: e.target.value})}/>

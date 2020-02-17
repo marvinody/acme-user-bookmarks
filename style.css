@@ -87,6 +87,10 @@ ul.nav > li {
     margin-left: 4apx;
 }
 
+.info {
+    color: darkgray !important;
+}
+
 /* loading animation */
 section.centerMe{
     display: flex;
