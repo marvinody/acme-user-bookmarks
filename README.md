@@ -1,2 +1,2 @@
 ## HOMEWORK
-    works in all sizes (mobile , tables or desktop)
+    works in all sizes (mobile , tablet or desktop)
