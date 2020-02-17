@@ -91,12 +91,12 @@ const fetchUser = async ()=> {
             <div className="field">
               <label className='hide'>url</label>
               <input className={notValid ? 'missingInfo' : null} type="text" name="url" placeholder='url' onChange={ (e)=> this.setState({ url: e.target.value})}/>
-              <span className={notValid ? 'show' : 'hide'}><i class="fas fa-exclamation-triangle"></i> url is required</span>
+              <span className={notValid ? 'show' : 'hide'}><i className="fas fa-exclamation-triangle"></i> url is required</span>
             </div>
             <div className="field">
               <label className="hide">category</label>
               <input  className={notValid ? 'missingInfo' : null} type="text" name="category" placeholder='Category' onChange={(e) => this.setState({category: e.target.value})}/>
-              <span className={notValid ? 'show' : 'hide'}><i class="fas fa-exclamation-triangle"></i> category is required</span>
+              <span className={notValid ? 'show' : 'hide'}><i className="fas fa-exclamation-triangle"></i> category is required</span>
             </div>
             <button className="ui button" type="submit" onClick ={create}>Submit</button>
           </form>
