@@ -1,0 +1,166 @@
+main {
+    display: flex;
+    justify-content: space-around;
+
+}
+
+.sports, .sport {
+    background-color: #2185d0!important;
+    color: white !important;
+}
+
+.news {
+    background-color: red !important;
+    color: white !important;
+}
+
+.movies {
+    background-color: #fbbd08!important;
+
+    color: white !important;
+}
+.shopping{
+    background-color: teal !important;
+    color: white !important;
+}
+
+.react, .javascript {
+    background-color: thistle;
+}
+
+.item-parent {
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+}
+
+.item-parent > div {
+    margin-bottom: 10px !important;
+}
+main > div {
+    padding: 15px;
+    width: 49%;
+    margin-left: 10px; 
+}
+main > form {
+    flex: 1;
+}
+
+/* nav */
+ul.nav {
+    display: flex;
+    justify-content: flex-start;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+ul.nav > li {
+    margin-right: 10px;
+}
+.selected {
+    background-color: dodgerblue;
+    color:white;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+/* form */
+.hide {
+    display: none !important;
+}
+.form {
+    margin-top: 15px;
+    padding: 7px;
+    margin-left: 26px;
+    margin-right: 20px;
+}
+/* loading animation */
+section.centerMe{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.lds-grid {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+  }
+  .lds-grid div {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: dodgerblue;
+    animation: lds-grid 1.2s linear infinite;
+  }
+  .lds-grid div:nth-child(1) {
+    top: 8px;
+    left: 8px;
+    animation-delay: 0s;
+  }
+  .lds-grid div:nth-child(2) {
+    top: 8px;
+    left: 32px;
+    animation-delay: -0.4s;
+  }
+  .lds-grid div:nth-child(3) {
+    top: 8px;
+    left: 56px;
+    animation-delay: -0.8s;
+  }
+  .lds-grid div:nth-child(4) {
+    top: 32px;
+    left: 8px;
+    animation-delay: -0.4s;
+  }
+  .lds-grid div:nth-child(5) {
+    top: 32px;
+    left: 32px;
+    animation-delay: -0.8s;
+  }
+  .lds-grid div:nth-child(6) {
+    top: 32px;
+    left: 56px;
+    animation-delay: -1.2s;
+  }
+  .lds-grid div:nth-child(7) {
+    top: 56px;
+    left: 8px;
+    animation-delay: -0.8s;
+  }
+  .lds-grid div:nth-child(8) {
+    top: 56px;
+    left: 32px;
+    animation-delay: -1.2s;
+  }
+  .lds-grid div:nth-child(9) {
+    top: 56px;
+    left: 56px;
+    animation-delay: -1.6s;
+  }
+  @keyframes lds-grid {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    main {
+        display: flex;
+        flex-direction: column;
+    }
+    .vertical, .divider {
+        display: none;
+    }
+    main > div {
+        width: 100%;
+    }
+    .form{
+        margin-left:20px;
+    }
+  }
+  
