@@ -53,8 +53,9 @@ const fetchUser = async ()=> {
           const {url, category} = props
           super(props);
           this.state ={
-            url,
-            category
+            url: '',
+            category: '',
+            notValid:false
           }
           this.create = this.create.bind(this);
       }
@@ -62,11 +63,26 @@ const fetchUser = async ()=> {
       create() {
          const {updateOnChange} = this.props;
          const {url, category} = this.state;
+         console.log(url, category)
+         if (url === '' && category === '') {
+            this.setState({notValid: true})
+            return window.alert('please enter an url and a category')
+         } else if(url === '' || category === '') {
+            this.setState({notValid: true})
+            return window.alert('please check your form')
+         }
+
          updateOnChange(url, category);
+
+         this.setState({
+             url: '',
+             category: '',
+             notValid: false
+         })
       }
 
       render(){
-          const {url, category} = this.state;
+          const {notValid} = this.state;
           const {create} = this;
         //   console.log(url);
         //   console.log(category);  
@@ -74,11 +90,13 @@ const fetchUser = async ()=> {
             <form className="ui form" onSubmit={ e => { e.preventDefault(); e.target.reset();}}>
             <div className="field">
               <label className='hide'>url</label>
-              <input type="text" name="url" placeholder='url' onChange={ (e)=> this.setState({ url: e.target.value})}/>
+              <input className={notValid ? 'missingInfo' : null} type="text" name="url" placeholder='url' onChange={ (e)=> this.setState({ url: e.target.value})}/>
+              <span className={notValid ? 'show' : 'hide'}><i class="fas fa-exclamation-triangle"></i> url is required</span>
             </div>
             <div className="field">
               <label className="hide">category</label>
-              <input type="text" name="category" placeholder='Category' onChange={(e) => this.setState({category: e.target.value})}/>
+              <input  className={notValid ? 'missingInfo' : null} type="text" name="category" placeholder='Category' onChange={(e) => this.setState({category: e.target.value})}/>
+              <span className={notValid ? 'show' : 'hide'}><i class="fas fa-exclamation-triangle"></i> category is required</span>
             </div>
             <button className="ui button" type="submit" onClick ={create}>Submit</button>
           </form>
@@ -119,16 +137,21 @@ const fetchUser = async ()=> {
   const Nav = (props) => {
       const { path, user, bookMarks, deleteOnChange} = props; 
       const pathname = path.location.pathname.slice(1);
-    //   console.log(pathname);
+      console.log(pathname);
       let navArray = helperCountFunc(bookMarks);
       let nav = []
+
       for (const link in navArray) {
         //   console.log(link)
         nav.push(<li key={link}><Link className={`${pathname === link ? 'selected' : null}`} to={`/${link}`}>{`${link} (${navArray[link]})`}</Link></li>);
       }
       const {fullName} = user;
-      console.log(user)
+    //   console.log(user)
       const numOfBookmakrs = bookMarks.length;
+
+      if(nav.length === 0) {
+        window.location.hash = "/";
+    }
     return(
         
         <div>
@@ -197,7 +220,7 @@ const fetchUser = async ()=> {
             console.log(this.state.user)
             await axios.delete(`${API}/users/${user.id}/bookmarks/${id}`);
             console.log(`${API}/users/${user.id}/bookmarks/${id}`);
-            this.setState({bookMarks :this.state.bookMarks.filter(_bookmark => _bookmark.id !== id) });
+            this.setState({bookMarks : this.state.bookMarks.filter(_bookmark => _bookmark.id !== id) });
 
 
         }

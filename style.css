@@ -74,6 +74,19 @@ ul.nav > li {
     margin-left: 26px;
     margin-right: 20px;
 }
+
+.missingInfo{
+    border: 1px solid rosybrown !important;
+}
+
+.show{
+    color: rosybrown !important;
+    font-style: italic;
+    margin-top: 2px;
+    display: block;
+    margin-left: 4apx;
+}
+
 /* loading animation */
 section.centerMe{
     display: flex;
