@@ -2,29 +2,59 @@
   <head>
     <style>
       * {
-        font-family: sans-serif;
+        font-family: Verdana, sans-serif;
+        /* font-family: Futura, Trebuchet MS, Arial, sans-serif; */
+        font-weight: 600;
       }
-      div {
-        margin: 1rem;
-      }
-      .navBar {
-        display: flex;
-        flex-direction: column;
-        border: solid 1px rgb(241, 241, 241);
-        margin: 0;
-        margin-bottom: 1rem;
+      button {
         padding: 5px;
+        cursor: pointer;
       }
-      form {
-        border: solid 1px black;
+      button:disabled {
+        cursor: default;
+      }
+      body {
+        background: linear-gradient(-45deg, #a8c8d1, #8cc3d8, #49b9d4, #0066ff);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+      }
+      nav {
+        border: solid 1px lightgray;
+        padding: 1rem;
         display: flex;
+        justify-content: space-evenly;
+      }
+      nav > * {
+        padding: 8px;
+        border-radius: 10px;
+      }
+      .selected {
+        background-color: rgba(18, 206, 253, 0.801);
+      }
+
+      form {
+        margin-top: 1rem;
+        display: flex;
+        border: solid 1px lightgray;
+        padding: 1rem;
         flex-direction: column;
       }
       form > * {
-        width: auto;
         margin: 1rem;
-        height: 2rem;
         padding: 5px;
+      }
+      .error {
+        color: red;
+      }
+      li {
+        list-style: none;
+        display: flex;
+        margin: 1rem;
+        padding: 1rem;
+        border: solid 0.5px lightgray;
+      }
+      li > * {
+        flex: 1;
       }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
@@ -36,10 +66,11 @@
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const API = `https://acme-users-api-rev.herokuapp.com/api`;
+      const API = "https://acme-users-api-rev.herokuapp.com/api";
       const { render } = ReactDOM;
       const { Component } = React;
       const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM;
+
       const fetchUser = async () => {
         const storage = window.localStorage;
         const userId = storage.getItem("userId");
@@ -56,15 +87,17 @@
         return user;
       };
 
-      const Nav = ({ path, bookmarks, categories }) => {
+      const Nav = ({ user, bookmarks, path, categories }) => {
         return (
-          <div className="navBar">
-            <h2>Categories</h2>
+          <div>
+            <h2>
+              {user.fullName} ( {bookmarks.length} Bookmarks )
+            </h2>
             <nav>
-              {categories.map(category => {
+              {categories.map((category, idx) => {
                 return (
-                  <Link to={`/${category.name}`} className={path === `/${category.name}` ? "selected" : ""}>
-                    {category.name} ({category.amount})
+                  <Link key={idx} to={`/${category[0]}`} className={path === `/${category[0]}` ? "selected" : ""}>
+                    {category[0]}({category[1]})
                   </Link>
                 );
               })}
@@ -72,59 +105,58 @@
           </div>
         );
       };
-      //
-      //
-      //
+
       class Form extends Component {
         constructor() {
           super();
           this.state = {
-            text: "",
+            url: "",
             category: "",
             error: ""
           };
           this.create = this.create.bind(this);
         }
         create() {
+          console.log(this.props.history);
           this.props
-            .create({ text: this.state.text, category: this.state.category })
-            .then(() => this.props.history.push(`/${this.state.category}`));
-          // .catch(ex => this.setState({ error: ex.response.data.message }));
+            .create({ url: this.state.url, category: this.state.category, error: this.state.error })
+            .then(() => {
+              this.props.history.push(`/${this.state.category.toUpperCase()}`);
+              this.setState({ url: "", category: "", error: "" });
+            })
+            .catch(ex => this.setState({ error: ex.message }));
         }
         render() {
-          const { text, category } = this.state;
+          const { url, category, error } = this.state;
           const { create } = this;
           return (
             <form onSubmit={ev => ev.preventDefault()}>
-              {!!this.state.error && <div className="error">{error}</div>}
-              <input value={text} placeholder="Insert url" onChange={ev => this.setState({ text: ev.target.value })} />
-              <input value={category} placeholder="Insert category" onChange={ev => this.setState({ category: ev.target.value })} />
-              <button
-                disabled={!text || !category}
-                onClick={() => {
-                  console.log(this.props);
-                  console.log(this.state);
-                  create();
-                }}
-              >
+              {!!error && <div className="error">{error}</div>}
+              <input value={url} placeholder="Url" onChange={ev => this.setState({ url: ev.target.value })} />
+              <input value={category} placeholder="Category" onChange={ev => this.setState({ category: ev.target.value })} />
+              <button disabled={!url || !category} onClick={() => create()}>
                 Create
               </button>
             </form>
           );
         }
       }
-      const Bookmarks = ({ bookmarks, category, destroy }) => {
+
+      const Bookmarks = ({ path, bookmarks, categories, user, destroy }) => {
+        // return null;
         return (
           <ul>
             {bookmarks
-              .filter(bookmark => bookmark.category === category)
+              .filter(bm => bm.category.toUpperCase() === path.slice(1))
               .map((bookmark, idx) => {
-                <li key={idx}>
-                  {bookmark.text}
-                  <button className="destroyButton" onClick={() => destroy(bookmark)}>
-                    Destroy
-                  </button>
-                </li>;
+                return (
+                  <li key={idx}>
+                    <a href={`https://${bookmark.url}`}>{bookmark.url}</a>
+                    <button history={history} onClick={() => destroy(bookmark)}>
+                      Destroy
+                    </button>
+                  </li>
+                );
               })}
           </ul>
         );
@@ -135,8 +167,7 @@
           super();
           this.state = {
             user: {},
-            bookmarks: [],
-            categories: []
+            bookmarks: []
           };
           this.create = this.create.bind(this);
           this.destroy = this.destroy.bind(this);
@@ -144,59 +175,73 @@
         async componentDidMount() {
           const user = await fetchUser();
           const bookmarks = (await axios.get(`${API}/users/${user.id}/bookmarks`)).data;
-          const categories = bookmarks.reduce((categories, bookmark) => {
-            if (categories[bookmark.category]) {
-              categories[bookmark.category].amount += 1;
-              return categories;
-            }
-            categories[bookmark.category].name = bookmark.category;
-            categories[bookmark.category].amount = 0;
-            return categories;
-          }, []);
-
-          this.setState({ user, bookmarks, categories });
+          this.setState({ user, bookmarks });
         }
-
-        async create({ text, category }) {
-          console.log(this.state);
-          const { user, bookmarks, categories } = this.state;
-          const bookmark = { text: text, category: category };
-          const newBookmark = (await axios.post(`${API}/users/${user.id}/bookmarks`, bookmark)).data;
-          const newCategory = { name: newBookmark.category, amount: 0 };
-          const newBookmarks = [...this.state.bookmarks, newBookmark];
-          this.setState({ newBookmarks });
-          if (this.state.categories[newCategory]) {
-            this.state.categories[newCategory].amount += 1;
-          } else {
-            this.state.categories[newCategory].push(newCategory);
+        async create({ url, category, error }) {
+          if (this.state.bookmarks.find(bm => bm.url === url)) {
+            const ex = new Error("That URL is already bookmarked!");
+            throw ex;
           }
+          const created = (
+            await axios.post(`${API}/users/${this.state.user.id}/bookmarks`, {
+              url,
+              category,
+              error
+            })
+          ).data;
+          const bookmarks = [...this.state.bookmarks, created];
+          this.setState({ bookmarks });
         }
-        async destroy() {}
+        async destroy(bookmark) {
+          console.log(history);
+          await axios.delete(`${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`).then(() => {
+            if (
+              this.state.bookmarks.filter(bm => bm.category.toUpperCase() === location.hash.slice(1)).length === 1 &&
+              this.bookmarks.length >= 1
+            ) {
+            }
 
+            return null;
+          });
+
+          this.setState({ bookmarks: this.state.bookmarks.filter(bm => bm.id !== bookmark.id) });
+        }
         render() {
-          const { user, bookmarks, categories } = this.state;
+          const { user, bookmarks } = this.state;
           const { create, destroy } = this;
+          const categories = Object.entries(
+            bookmarks.reduce((acc, bookmark) => {
+              if (acc[bookmark.category] !== undefined) {
+                acc[bookmark.category]++;
+                return acc;
+              }
+              acc[bookmark.category] = 1;
+              return acc;
+            }, {})
+          ).map(cat => [cat[0].toUpperCase(), cat[1]]);
+
+          if (location.hash.slice(1) === "/" && bookmarks.length > 0) {
+            location.hash = `/${bookmarks[0].category.toUpperCase()}`;
+          }
           return (
             <HashRouter>
-              <h1>
-                {user.fullName} ( {bookmarks.length} Bookmarks ){" "}
-              </h1>
-              <Nav path={location.pathname} bookmarks={bookmarks} categories={categories} />
-              <Form history={history} create={create} bookmarks={bookmarks} categories={categories} />
-              <Switch>
-                <Route
-                  path="/bookmarks/:category?"
-                  render={() => (
-                    <Bookmarks
-                      bookmarks={bookmarks}
-                      category={categories.filter(category => location.pathname.slice(1) === category.name)[0]}
-                      destroy={destroy}
-                    />
-                  )}
-                />
-              </Switch>
+              <Route
+                render={({ location }) => <Nav path={location.pathname} bookmarks={bookmarks} user={user} categories={categories} />}
+              />
+              <Route
+                render={({ history }) => {
+                  console.log(history);
+                  return <Form user={user} bookmarks={bookmarks} create={create} categories={categories} history={history} />;
+                }}
+              />
+              <Route
+                render={({ location }) => (
+                  <Bookmarks path={location.pathname} bookmarks={bookmarks} user={user} categories={categories} destroy={destroy} />
+                )}
+              />
             </HashRouter>
           );
+          return null;
         }
       }
 
