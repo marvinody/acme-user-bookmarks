@@ -1,0 +1,46 @@
+nav {
+  display: flex;
+  justify-content: space-around;
+  color: black;
+  width: 90%;
+  padding: 1rem;
+  text-align: center;
+}
+
+.notSelected {
+  background-color: white;
+  padding: 1rem;
+  width: 90px;
+  text-align: center;
+  color: black;
+}
+
+.selected {
+  background-color: green;
+  color: white;
+  padding: 1rem;
+  width: 90px;
+  text-align: center;
+}
+
+input,
+form > button {
+  width: 90%;
+}
+
+ul {
+  padding: 0;
+}
+
+li {
+  width: 80%;
+  list-style: none;
+  margin: 2rem;
+}
+
+li > button {
+  width: 80%;
+  float: right;
+  position: relative;
+  right: -10%;
+}
