@@ -94,7 +94,8 @@
       const { Component } = React;
       const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM;
 
-      const List = ({ bookMarks, match, destroy, create, edit }) => {
+      const List = ({ bookMarks, match, destroy, create, history }) => {
+        console.log(history);
         let arrayToList = bookMarks.filter(bookmark => {
           return bookmark.category === match.params.filter;
         });
@@ -192,7 +193,9 @@
               />
               <button
                 disabled={url === ""}
-                onClick={() => this.props.create(category, url)}
+                onClick={props =>
+                  this.props.create(category, url, this.props.history)
+                }
               >
                 Create
               </button>
@@ -214,9 +217,13 @@
         }
 
         async create(category, url, history) {
+          const cat = `/${category}`;
+          // if (category) {
+          //   history.push(`/${category}`);
+          // }
+          history.push(cat);
           const { bookMarks } = this.state;
           const userid = window.localStorage.getItem("userId");
-
           await axios
             .post(`${API}/users/${userid}/bookmarks`, {
               category: category,
@@ -270,7 +277,15 @@
                     );
                   }}
                 />
-                <Form create={create} />
+                <Route
+                  render={props => (
+                    <Form
+                      create={create}
+                      match={props.match}
+                      history={props.history}
+                    />
+                  )}
+                />
                 <Route
                   path="/:filter"
                   render={props => (
