@@ -121,14 +121,16 @@
       }
 
       const Nav = ({ path, bookmarks })=> {
-        const news = bookmarks.filter( bookmark => bookmark.category === 'news');
+        const entertainment = bookmarks.filter( bookmark => bookmark.category === 'entertainment');
         const shopping = bookmarks.filter( bookmark => bookmark.category === 'shopping');
+        const news = bookmarks.filter( bookmark => bookmark.category === 'news');
         const search = bookmarks.filter( bookmark => bookmark.category === 'search');
 
         return (
           <nav>
-            <Link to='/news' className={ path === '/news' ? 'selected': ''}>NEWS ({ news.length })</Link>
+            <Link to='/entertainment' className={ path === '/entertainment' ? 'selected': ''}>ENTERTAINMENT ({ entertainment.length })</Link>
             <Link to='/shopping' className={ path === '/shopping' ? 'selected': ''}>SHOPPING ({ shopping.length })</Link>
+            <Link to='/news' className={ path === '/news' ? 'selected': ''}>NEWS ({ news.length })</Link>           
             <Link to='/search' className={ path === '/search' ? 'selected': ''}>SEARCH ({ search.length })</Link>
           </nav>
         );
@@ -141,7 +143,7 @@
               bookmarks.filter(bookmark => bookmark.category === path.slice(1) ).map( bookmark =>
                <li 
                 key={ bookmark.id }>
-                  <a href = {bookmark.url} >{ bookmark.url}</a>
+                  <a href = {bookmark.url} target='_blank'>{ bookmark.url}</a>
                   <button onClick={ ()=> destroy(bookmark)}>Destroy</button>
               </li>)
             }
@@ -218,10 +220,12 @@
                 <Route render={ ({ location })=> <Nav path={ location.pathname } bookmarks = {bookmarks} />} />
                 <Create  create= {create}/>
                 <Switch>
-                  <Route exact path='/news' render={ ({ location })=>
+                  <Route exact path='/entertainment' render={ ({ location })=>
                    <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />
                   <Route exact path='/shopping' render={ ({ location })=>
-                   <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } /> 
+                   <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />  
+                  <Route exact path='/news' render={ ({ location })=>
+                   <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />
                   <Route exact path='/search' render={ ({ location })=>
                    <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } /> 
                 </Switch>  
