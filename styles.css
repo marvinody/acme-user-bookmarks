@@ -1,0 +1,63 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: sans-serif;
+  }
+  
+  nav {
+    display: flex;
+    justify-content: space-around;
+    padding: 0.75rem;
+  }
+  
+  nav a {
+    color: black;
+    font-size: small;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    margin: 0.75rem;
+    padding: 1rem;
+    border: black solid 1px;
+  }
+  
+  input, button {
+    flex: 1;
+    margin: 5px;
+    border-radius: 2px;
+  }
+  
+  button {
+    border-radius: 4px;
+  }
+  
+  li,div, h2 {
+    padding: 4px;
+  }
+  
+  a {
+    flex: 2;
+  }
+  
+  .selected {
+    padding: 5px;
+    background-color: teal;
+  }
+  
+  .selected > a {
+    color: white;
+  }
+  
+  .bookmarks {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .nav{
+      display: flex;
+      flex-direction: row;
+  }
