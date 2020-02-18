@@ -193,13 +193,11 @@
         async componentDidMount() {
           const user = await fetchUser();
           const bookmarks = (await axios.get(`${API}/users/${ user.id }/bookmarks`)).data;
-          //console.log(user.id);
           this.setState({user, bookmarks});
         }
 
         async create(bookmark){
           const created = (await axios.post(`${API}/users/${this.state.user.id}/bookmarks`, bookmark)).data;
-          //console.log(created);
           const bookmarks = [...this.state.bookmarks, created ];
           this.setState({ bookmarks }); 
         }
@@ -230,9 +228,7 @@
                    <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } /> 
                 </Switch>  
               </HashRouter>
-            </main>
-
-              
+            </main>       
           )
         }
       }
