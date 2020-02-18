@@ -229,8 +229,9 @@
 
         async destroy(bookmark) {
           const { bookmarks } = this.state;
+          
           await axios.delete(
-            `${API}/users/${this.state.user.id}/bookmarks/${bookmarks.id}`
+            `${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`
           );
           this.setState({
             bookmarks: this.state.bookmarks.filter(
@@ -239,8 +240,6 @@
           });
         }
 
-
-        
         async create(bookmark, history) {
           const created = (
             await axios.post(
