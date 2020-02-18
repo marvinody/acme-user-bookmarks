@@ -1,6 +1,58 @@
 <html>
   <head>
 <style>
+  body {
+    font-family: sans-serif;
+  }
+
+  #categories {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  #categories > * {
+    text-transform: capitalize;
+    list-style-type: none;
+    padding: 0.5rem;
+  }
+
+  .selected {
+    color: white;
+    background-color: seagreen;
+    border-radius: 10px;
+  }
+
+  #create {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem;
+    padding: 1rem;
+    border: 1px black solid;
+    border-radius: 10px;
+  }
+
+  input {
+    padding: 0.5rem
+  }
+  
+  button {
+    padding: 0.5rem
+  }
+  
+  .bookmark {
+    display: flex;
+    list-style-type: none;
+    justify-content: space-between;
+  }
+
+  .bookmark > * {
+    display: flex;
+    flex: 1;
+  }
+
+  .bookmark > button {
+    justify-content: center;
+  }
 
 </style>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js'></script>
@@ -12,8 +64,145 @@
   <body>
     <div id='root'></div>
     <script type='text/babel'>
+      const { render } = ReactDOM
+      const { Component } = React
+      const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM;
+
       const root = document.querySelector('#root');
-      ReactDOM.render(<hr />, root);
+
+      const API = 'https://acme-users-api-rev.herokuapp.com/api';
+
+      const fetchUser = async () => {
+        const storage = window.localStorage;
+        const userId = storage.getItem('userId'); 
+        if(userId){
+          try {
+            return (await axios.get(`${API}/users/detail/${userId}`)).data;
+          }
+          catch(ex){
+            storage.removeItem('userId');
+            return fetchUser();
+          }
+        }
+        const user = (await axios.get(`${API}/users/random`)).data;
+        storage.setItem('userId', user.id);
+        return user;
+      };
+      
+      const fetchBookmarks = async (user)=> {
+        return (await axios.get(`${API}/users/${user.id}/bookmarks`)).data;
+      };
+
+
+      const Nav = ({bookmarks, path}) => {
+        const categories = bookmarks.reduce((accum, bookmark) => {
+          let category = bookmark.category;
+          if (!accum.includes(category)) {
+            accum.push(category)
+          }
+          return accum;
+        }, [])
+        
+        return (
+          <nav id="categories">
+            {categories.map((category, idx) => {
+              return (
+                <Link to={category} key={idx} className={path.slice(1) === category ? "selected": ""}>{category} ({bookmarks.filter(bookmark  => bookmark.category === category).length})</Link>
+              )
+            })}            
+          </nav>
+        )
+      }
+      
+      const Bookmarks = ({bookmarks, destroy, path}) => {
+        return (
+          <ul>
+            {bookmarks.filter(bookmark => path.slice(1) === bookmark.category)
+              .map((bookmark, idx) => {
+                return (
+                  <div className="bookmark" key={idx}>
+                    <a href={`http://${bookmark.url}`}>{bookmark.url}</a>
+                    <button onClick={ () => destroy(bookmark) }>Delete</button>
+                  </div>
+                )
+              })
+            }
+          </ul>
+        )
+      }
+
+      class Create extends Component {
+        constructor() {
+          super()
+          this.state = {
+            url: '',
+            category: ''
+          }
+          this.create = this.create.bind(this);
+        }
+        
+        create() {
+          this.props.create({ url: this.state.url, category: this.state.category })
+        }
+        
+        render(){
+          const { url, category } = this.state;
+          const { create } = this;
+          return (
+            <form id="create" onSubmit = { event => event.preventDefault() }>
+              <input placeholder='url' onChange={ (event)=> this.setState({ url: event.target.value })}/>
+              <input placeholder='category' onChange={ (event)=> this.setState({ category: event.target.value }) }/>
+              <button onClick={ create }>Create</button>
+            </form>
+          );
+        }
+      }
+
+      class App extends Component {
+        constructor() {
+          super();
+          this.state = {
+            user: {},
+            bookmarks: []
+          }
+          this.create = this.create.bind(this);
+          this.destroy = this.destroy.bind(this);
+        }
+
+        async componentDidMount() {
+          const user = await fetchUser();
+          const bookmarks = await fetchBookmarks(user);
+          this.setState({user, bookmarks});
+        }
+
+        async create(newBookmark) {
+          const created = (await axios.post(`${API}/users/${this.state.user.id}/bookmarks`, newBookmark)).data;
+          const bookmarks = [...this.state.bookmarks, created];
+          this.setState({ bookmarks })
+        }
+
+        async destroy(bookmark){
+          await axios.delete(`${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`);
+          this.setState({ bookmarks : this.state.bookmarks.filter( _bookmark => _bookmark.id !== bookmark.id)});
+        }
+
+        render() {
+          const {user, bookmarks} = this.state;
+          const {create, destroy} = this;
+          return (
+            <HashRouter>
+              <h1>{user.fullName} ({bookmarks.length} Bookmarks)</h1>
+              <Route render={({location}) => <Nav path={location.pathname} bookmarks={bookmarks} />} />
+              <Create create={create}/>
+              <Switch>
+                <Route path={'/:filter?'} render={ ({ location }) => <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />
+              </Switch>
+            </HashRouter>
+          )
+        }
+      }
+      
+      render(<App />, root);
     </script>
   </body>
 </html>
