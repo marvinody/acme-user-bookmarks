@@ -25,7 +25,9 @@ const fetchUser = async ()=> {
 
 const fetchBookmarks = async userId => {
     return (await axios.get(`${API}/users/${userId}/bookmarks`)).data
-  }
+}
+
+
 
 const createCategories = bookmarks => {
     const categories = bookmarks.reduce((acc, bookmark) => {
@@ -36,6 +38,7 @@ const createCategories = bookmarks => {
         return acc
     }, {})
     categories.all = bookmarks.length 
+    // my attempt at getting the numbers to show next to nav bar categories
     return categories
 }
 
@@ -43,13 +46,15 @@ const createCategories = bookmarks => {
 
 
 const Nav = ({path, categories}) =>{
+    console.log(path);
     const currCategories = Object.keys(categories)
 
     return(
         <div className = 'nav'>
             {currCategories.map(cat =>{
                 return (
-                    <div key = {cat} className= {path === `${cat}` ? 'selected' : ''}>
+                    <div key = {cat} className= {path === `/${cat}` ? 'selected' : ''}>
+                        {/* the selected className isnt being added properly */}
                         <nav>
                         <Link to= {`/${cat}`} >{cat} ()</Link>
                         </nav>
@@ -77,8 +82,7 @@ class CreateBookmark extends Component{
         this.props
             .create(bookmark)
             .then(() => this.props.history.push(`/${category}`))
-            .then(this.setState({category: '',url: ''})
-        )
+            .then(this.setState({category: `${category}`,url: `${url}`}))
       }
 
     render(){
@@ -111,7 +115,7 @@ class CreateBookmark extends Component{
 
 
 const Bookmarks = ({ path, bookmarks, destroy }) => {
-    const renderBookmarks = bookmarks => {
+    const renderBookmarks = (bookmarks) => {
       return bookmarks.map(bookmark => {
         return (
           <li className="bookmarks" key={bookmark.id}>
@@ -121,13 +125,13 @@ const Bookmarks = ({ path, bookmarks, destroy }) => {
         )
       })
     }
-
+// console.log(path)
     if (path === 'all') {
       return <ul>{renderBookmarks(bookmarks)}</ul>
     } 
     else {
-      const path = bookmarks.filter( bookmark => bookmark.category === path )
-      return <ul>{renderBookmarks(path)}</ul>
+      const filteredBooks = bookmarks.filter( bookmark => bookmark.category === path )
+      return <ul>{renderBookmarks(filteredBooks)}</ul>
     }
   }
 
@@ -181,9 +185,9 @@ class App extends Component{
                 path="/:path?"
                 render={({ history, match }) => (
                   <main>
-                    <Nav  path={match.params.filter} categories={categories} />
+                    <Nav  path={match.params.path} categories={categories} />
                     <CreateBookmark history={history} create={create} />
-                    <Bookmarks path={match.params.filter} bookmarks={bookmarks} destroy={destroy}/>
+                    <Bookmarks path={match.params.path} bookmarks={bookmarks} destroy={destroy}/>
                   </main>
                 )}
               />
@@ -191,6 +195,9 @@ class App extends Component{
         )
     }
 }
+
+// the bookmarks arent rendering when you click on one of the nav bar items, its because path isnt rendering or changing
+// also why doesnt the state reset on a hard reset or relaod?
 
 
 
