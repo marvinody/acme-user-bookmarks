@@ -1,62 +1,6 @@
 <html>
   <head>
-    <style>
-      * {
-        font-family: Verdana, sans-serif;
-        /* font-family: Futura, Trebuchet MS, Arial, sans-serif; */
-        font-weight: 600;
-      }
-      button {
-        padding: 5px;
-        cursor: pointer;
-      }
-      button:disabled {
-        cursor: default;
-      }
-      body {
-        background: linear-gradient(-45deg, #a8c8d1, #8cc3d8, #49b9d4, #0066ff);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-      }
-      nav {
-        border: solid 1px lightgray;
-        padding: 1rem;
-        display: flex;
-        justify-content: space-evenly;
-      }
-      nav > * {
-        padding: 8px;
-        border-radius: 10px;
-      }
-      .selected {
-        background-color: rgba(18, 206, 253, 0.801);
-      }
-
-      form {
-        margin-top: 1rem;
-        display: flex;
-        border: solid 1px lightgray;
-        padding: 1rem;
-        flex-direction: column;
-      }
-      form > * {
-        margin: 1rem;
-        padding: 5px;
-      }
-      .error {
-        color: red;
-      }
-      li {
-        list-style: none;
-        display: flex;
-        margin: 1rem;
-        padding: 1rem;
-        border: solid 0.5px lightgray;
-      }
-      li > * {
-        flex: 1;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
@@ -86,7 +30,9 @@
         storage.setItem("userId", user.id);
         return user;
       };
-
+      //
+      //
+      //
       const Nav = ({ user, bookmarks, path, categories }) => {
         return (
           <div>
@@ -105,7 +51,10 @@
           </div>
         );
       };
-
+      //
+      //
+      //
+      //
       class Form extends Component {
         constructor() {
           super();
@@ -117,15 +66,20 @@
           this.create = this.create.bind(this);
         }
         create() {
-          console.log(this.props.history);
           this.props
             .create({ url: this.state.url, category: this.state.category, error: this.state.error })
             .then(() => {
               this.props.history.push(`/${this.state.category.toUpperCase()}`);
               this.setState({ url: "", category: "", error: "" });
             })
-            .catch(ex => this.setState({ error: ex.message }));
+            .catch(ex => {
+              this.setState({ error: ex.message });
+              setTimeout(() => {
+                this.setState({ error: "" });
+              }, 3000);
+            });
         }
+
         render() {
           const { url, category, error } = this.state;
           const { create } = this;
@@ -135,15 +89,18 @@
               <input value={url} placeholder="Url" onChange={ev => this.setState({ url: ev.target.value })} />
               <input value={category} placeholder="Category" onChange={ev => this.setState({ category: ev.target.value })} />
               <button disabled={!url || !category} onClick={() => create()}>
-                Create
+                <span className="create">Create</span>
               </button>
             </form>
           );
         }
       }
-
-      const Bookmarks = ({ path, bookmarks, categories, user, destroy }) => {
+      //
+      //
+      //
+      const Bookmarks = ({ path, bookmarks, categories, user, destroy, history }) => {
         // return null;
+
         return (
           <ul>
             {bookmarks
@@ -151,9 +108,20 @@
               .map((bookmark, idx) => {
                 return (
                   <li key={idx}>
-                    <a href={`https://${bookmark.url}`}>{bookmark.url}</a>
-                    <button history={history} onClick={() => destroy(bookmark)}>
-                      Destroy
+                    <a href={`https://${bookmark.url}`} className="url">
+                      {bookmark.url}
+                    </a>
+                    <button
+                      history={history}
+                      onClick={function() {
+                        if (bookmarks.filter(bm => bm.category === bookmark.category).length === 1 && bookmarks.length > 0) {
+                          const firstCat = bookmarks[0].category.toUpperCase();
+                          history.push(`/${firstCat}`);
+                        }
+                        return destroy(bookmark);
+                      }}
+                    >
+                      <span className="destroy">Destroy</span>
                     </button>
                   </li>
                 );
@@ -161,7 +129,9 @@
           </ul>
         );
       };
-
+      //
+      //
+      //
       class App extends Component {
         constructor() {
           super();
@@ -193,17 +163,7 @@
           this.setState({ bookmarks });
         }
         async destroy(bookmark) {
-          console.log(history);
-          await axios.delete(`${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`).then(() => {
-            if (
-              this.state.bookmarks.filter(bm => bm.category.toUpperCase() === location.hash.slice(1)).length === 1 &&
-              this.bookmarks.length >= 1
-            ) {
-            }
-
-            return null;
-          });
-
+          await axios.delete(`${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`);
           this.setState({ bookmarks: this.state.bookmarks.filter(bm => bm.id !== bookmark.id) });
         }
         render() {
@@ -230,14 +190,22 @@
               />
               <Route
                 render={({ history }) => {
-                  console.log(history);
                   return <Form user={user} bookmarks={bookmarks} create={create} categories={categories} history={history} />;
                 }}
               />
               <Route
-                render={({ location }) => (
-                  <Bookmarks path={location.pathname} bookmarks={bookmarks} user={user} categories={categories} destroy={destroy} />
-                )}
+                render={({ location, history }) => {
+                  return (
+                    <Bookmarks
+                      history={history}
+                      path={location.pathname}
+                      bookmarks={bookmarks}
+                      user={user}
+                      categories={categories}
+                      destroy={destroy}
+                    />
+                  );
+                }}
               />
             </HashRouter>
           );
