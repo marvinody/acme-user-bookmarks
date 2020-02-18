@@ -103,7 +103,7 @@
           if (curr.category === "search") return acc++;
         }, 0);
 
-        console.log(newsLength, "nav");
+
 
         return (
           <nav>
@@ -126,12 +126,13 @@
       };
 
       const Bookmark = ({ bookmarks, match, destroy }) => {
-        console.log(bookmarks, "bookmark function");
-
+        console.log(match);
         return (
           <main>
             <ul>
-              {bookmarks.map((bookmark, idx) => (
+              {bookmarks
+              .filter(filt => filt.category === 'news')
+              .map((bookmark, idx) => (
                 <li key={idx}>
                   {bookmark.url}
                   <button onClick={() => destroy(bookmark)}>destroy</button>
@@ -280,20 +281,37 @@
               <Switch>
                 <Route
                   path="/news"
-                  render={({ history }) => (
+                  render={({ props }) => (
                     <Bookmark
+                      {...props}
                       history={history}
                       create={create}
                       bookmarks={bookmarks}
+                      destroy={destroy}
+
+                    />
+                  )}
+                />
+                <Route
+                  
+                  path="/shopping"
+                  render={props => (
+                    <Bookmark
+                      {...props}
+                      destroy={destroy}
+                      match={props.match}
+                      bookmarks={bookmarks}
+                      update={update}
                       destroy={destroy}
                     />
                   )}
                 />
                 <Route
-                  exact
-                  path="/shopping"
+                  
+                  path="/search"
                   render={props => (
                     <Bookmark
+                      {...props}
                       destroy={destroy}
                       match={props.match}
                       bookmarks={bookmarks}
