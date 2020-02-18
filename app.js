@@ -196,8 +196,8 @@ class App extends Component{
     }
 }
 
-// the bookmarks arent rendering when you click on one of the nav bar items, its because path isnt rendering or changing
 // also why doesnt the state reset on a hard reset or relaod?
+// Have to refresh after creating, not sure why
 
 
 
