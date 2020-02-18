@@ -1,1 +1,86 @@
+<html>
+  <head>
+<style>
+
+</style>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js'></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.0/react-router-dom.js'></script>
+  </head>
+  <body>
+    <div id='root'></div>
+   
+    <script type='text/babel'>
+
+      //Destructuring
+      const {Component} = React
+      const { HashRouter, Link, Route, Switch, Redirect } = ReactRouterDOM
+      const API = 'https://acme-users-api-rev.herokuapp.com/api';
+
+      //Fetches User Data
+      const fetchUser = async ()=> {
+        const storage = window.localStorage;
+        const userId = storage.getItem('userId'); 
+        if(userId){
+          try {
+            return (await axios.get(`${API}/users/detail/${userId}`)).data;
+          }
+          catch(ex){
+            storage.removeItem('userId');
+            return fetchUser();
+         }
+        }
+
+        const user = (await axios.get(`${API}/users/random`)).data;
+        storage.setItem('userId', user.id);
+        return  user;  
+      };
+
+      // Fetches Bookmark Data
+      const fetchBookmarks = async(userId) => {
+          try {
+            return (await axios.get(`${API}/users/${userId}/bookmarks`)).data;
+          }
+          catch(ex){
+            return fetchBookmarks()
+          }
+      }
+
+      // Class App
+      class App extends Component {
+        constructor() {
+          super()
+          this.state = {
+            user: {},
+            bookmarks: [],
+
+          }
+        }
+
+        async componentDidMount() {
+          const user = await fetchUser()
+          console.log(user)
+          const bookmarks = await fetchBookmarks(user.id)
+
+          this.setState = {user,bookmarks}
+        }
+
+        render() {
+          const {user, bookmarks} = this.state
+          return (
+            <HashRouter>
+              <h2 id="header"> {`${user.fullName} (${bookmarks.length}) Bookmark(s)`}</h2>
+            </HashRouter>
+          )
+        }
+      }
+
+      // Renders to webpage
+      const root = document.querySelector('#root');
+      ReactDOM.render(<App />, root);
+    </script>
+  </body>
+</html>
 
