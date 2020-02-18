@@ -2,6 +2,60 @@
   <head>
 <style>
 
+* {
+  font-family: Helvetica;
+}
+
+nav {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+  text-transform: uppercase;
+}
+
+a {
+  padding: 1rem
+}
+
+a.selected {
+  background-color: slategray;
+  border-radius: 10%;
+  color: white;
+}
+
+form {
+  display: flex;
+  border: 1px solid black;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+input {
+  font-size: larger;
+  margin: .5rem;
+}
+
+button {
+  font-size: larger;
+  margin: .5rem;
+}
+
+ul > li{
+  display: flex;
+  justify-content: space-around;
+  list-style-type: none;
+}
+
+li > a {
+  font-weight: bold;
+  width: 50%;
+  text-align: center;
+}
+
+li > button {
+  width: 50%;
+}
+
 </style>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js'></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
@@ -62,6 +116,7 @@
       );
     };
 
+    // NavBar Component
     const NavBar = ({ bookmarks, path, categories}) => {
       return (
         <nav>
@@ -77,6 +132,7 @@
       );
     };
 
+    // Creates Form
     class Form extends Component {
       constructor() {
         super()
@@ -105,6 +161,7 @@
       }
     }
 
+    // Creates App
     class App extends Component {
       constructor() {
         super();
@@ -162,6 +219,7 @@
       }
     }
       
+    // Renders Data into Webpage
     const root = document.querySelector('#root');
     ReactDOM.render(<App />, root);
     </script>
