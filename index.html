@@ -19,7 +19,7 @@
   }
 
   nav a {
-    height: 2rem; 
+    height: 2rem;
     padding: 0.3rem;
   }
 
@@ -47,7 +47,7 @@
     margin-left: 0.5rem;
     margin-right: 0.5rem;
     background-color: lightgray;
-    height: 1.5rem;  
+    height: 1.5rem;
   }
 
   ul {
@@ -99,7 +99,7 @@
 
       const fetchUser = async ()=> {
         const storage = window.localStorage;
-        const userId = storage.getItem('userId'); 
+        const userId = storage.getItem('userId');
         if(userId){
           try {
             return (await axios.get(`${API}/users/detail/${userId}`)).data;
@@ -130,7 +130,7 @@
           <nav>
             <Link to='/entertainment' className={ path === '/entertainment' ? 'selected': ''}>ENTERTAINMENT ({ entertainment.length })</Link>
             <Link to='/shopping' className={ path === '/shopping' ? 'selected': ''}>SHOPPING ({ shopping.length })</Link>
-            <Link to='/news' className={ path === '/news' ? 'selected': ''}>NEWS ({ news.length })</Link>           
+            <Link to='/news' className={ path === '/news' ? 'selected': ''}>NEWS ({ news.length })</Link>
             <Link to='/search' className={ path === '/search' ? 'selected': ''}>SEARCH ({ search.length })</Link>
           </nav>
         );
@@ -141,7 +141,7 @@
           <ul>
             {
               bookmarks.filter(bookmark => bookmark.category === path.slice(1) ).map( bookmark =>
-               <li 
+               <li
                 key={ bookmark.id }>
                   <a href = {bookmark.url} target='_blank'>{ bookmark.url}</a>
                   <button onClick={ ()=> destroy(bookmark)}>Destroy</button>
@@ -153,7 +153,7 @@
 
       class Create extends Component{
         constructor(){
-          super(); 
+          super();
           this.state = {
             url: '',
             category: '',
@@ -162,9 +162,9 @@
           this.create = this.create.bind(this);
         }
         create(){
-          this.props.create({ url: this.state.url, category: this.state.category })     
+          this.props.create({ url: this.state.url, category: this.state.category })
         }
-        
+
         render(){
           const { url, category, error } = this.state;
           const { create } = this;
@@ -199,9 +199,9 @@
         async create(bookmark){
           const created = (await axios.post(`${API}/users/${this.state.user.id}/bookmarks`, bookmark)).data;
           const bookmarks = [...this.state.bookmarks, created ];
-          this.setState({ bookmarks }); 
+          this.setState({ bookmarks });
         }
-        
+
         async destroy(bookmark){
           await axios.delete(`${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`);
           this.setState({ bookmarks : this.state.bookmarks.filter( _bookmark => _bookmark.id !== bookmark.id)});
@@ -221,14 +221,14 @@
                   <Route exact path='/entertainment' render={ ({ location })=>
                    <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />
                   <Route exact path='/shopping' render={ ({ location })=>
-                   <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />  
+                   <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />
                   <Route exact path='/news' render={ ({ location })=>
                    <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />
                   <Route exact path='/search' render={ ({ location })=>
-                   <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } /> 
-                </Switch>  
+                   <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />
+                </Switch>
               </HashRouter>
-            </main>       
+            </main>
           )
         }
       }
