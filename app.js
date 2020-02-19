@@ -21,7 +21,7 @@ const fetchUser = async () => {
 
 const Nav = ({ match, create, history, user, bookmarks }) => {
   const bookmarked = bookmarks.filter(bookmark => bookmark.category)
-
+  // nested destructuring! advanced js, nice
   const {
     params: { filter }
   } = match
@@ -81,6 +81,7 @@ class FormInput extends Component {
     }
     this.onSubmit = this.onSubmit.bind(this)
   }
+  // perfect use of onSubmit!
   onSubmit(ev) {
     ev.preventDefault()
     this.props.create(this.state.url, this.state.category)
@@ -124,6 +125,7 @@ class App extends Component {
     const { user, bookmarks } = this.state
     await axios.delete(`${API}/users/${user.id}/bookmarks/${bookmark.id}`)
     this.setState({
+      // good use of filter in your setstate. functional!
       bookmarks: bookmarks.filter(bkmk => bkmk.id !== bookmark.id)
     })
   }
@@ -168,3 +170,7 @@ class App extends Component {
 }
 const root = document.querySelector('#root')
 render(<App />, root)
+
+// nice styling!
+// I like the transitions
+// definitely some advanced JS stuff, I like it!
