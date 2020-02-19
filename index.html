@@ -125,6 +125,11 @@
       const Nav = ({ path, bookMarks }) => {
         let navArray = []
         let unuqArray = []
+        // map returns a new array but you're not using it...
+        // this would be a perfect use case for map actually!
+        // navArray = bookmarks.map(bookmark => bookmark.category)
+        // then you can chain a .reduce off of it and keep going!
+        // interesting solution you have to this part of it, I have to say
         bookMarks.map(bookmark => {
           navArray.push(bookmark.category)
         })
@@ -224,6 +229,9 @@
           history.push(cat)
           const { bookMarks } = this.state
           const userid = window.localStorage.getItem("userId")
+          // you use await/async WITH .then/.catch... try to pick one or the other
+          // seeing both worries me because it's easy to get bugs
+          // switching between functions is ok, but switching inside of a function is dangerous
           await axios
             .post(`${API}/users/${userid}/bookmarks`, {
               category: category,
@@ -231,6 +239,11 @@
               rating: 5,
             })
             .catch(ex => alert(ex, "probably incorect URL"))
+          // hmm, while this works, try using the data that the post requests returns
+          // issuing another get request may take a LONG time to go get
+          // but if the post requests returns the data you need already, you might as well
+          // just add it to state already!
+          // (this is not always the case but generally true)
           await axios
             .get(`${API}/users/${userid}/bookmarks`)
             .then(res => this.setState({ bookMarks: res.data }))
@@ -252,6 +265,8 @@
         async componentDidMount() {
           fetchUser()
           const userid = window.localStorage.getItem("userId")
+          // yes... you can do it this way, but why do that when you can await fetchUser and do that?
+          // you're doing extra work! while ok, be wary of what's given to you
           const user = await axios
             .get(`${API}/users/detail/${userid}`)
             .catch(ex => alert(ex.message))
