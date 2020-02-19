@@ -126,6 +126,7 @@
       }
 
       const Nav = ({ path, bookmarks }) => {
+        // good use of filters, but how would you do it without hardcoding the category
         const entertainment = bookmarks.filter(
           bookmark => bookmark.category === "entertainment"
         )
@@ -165,6 +166,7 @@
         return (
           <ul>
             {bookmarks
+              // good use of filter/map
               .filter(bookmark => bookmark.category === path.slice(1))
               .map(bookmark => (
                 <li key={bookmark.id}>
@@ -184,6 +186,7 @@
           this.state = {
             url: "",
             category: "",
+            // you have this error var in your state, but dont do anything with it?
             error: "",
           }
           this.create = this.create.bind(this)
@@ -253,6 +256,7 @@
           await axios.delete(
             `${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`
           )
+          // good use of filter to remote the element
           this.setState({
             bookmarks: this.state.bookmarks.filter(
               _bookmark => _bookmark.id !== bookmark.id
