@@ -93,11 +93,15 @@
         return user
       }
 
+      // I like this!
+      // good use of breaking them out
       const fetchBookmarks = async user => {
         return (await axios.get(`${API}/users/${user.id}/bookmarks`)).data
       }
 
       const Nav = ({ bookmarks, path }) => {
+        // good use of reduce, changing data structures
+        // can be done with filter also!
         const categories = bookmarks.reduce((accum, bookmark) => {
           let category = bookmark.category
           if (!accum.includes(category)) {
@@ -132,6 +136,7 @@
         return (
           <ul>
             {bookmarks
+              // great use of method chaining! solid improvement
               .filter(bookmark => path.slice(1) === bookmark.category)
               .map((bookmark, idx) => {
                 return (
@@ -160,12 +165,15 @@
             url: this.state.url,
             category: this.state.category,
           })
+          // try clearing out the state after creating
         }
 
         render() {
           const { url, category } = this.state
           const { create } = this
           return (
+            // try doing your create in here, instead of on click
+            // good job doing the preventDefault though!
             <form id="create" onSubmit={event => event.preventDefault()}>
               <input
                 placeholder="url"
@@ -194,6 +202,7 @@
           this.destroy = this.destroy.bind(this)
         }
 
+        // clean code from the stuff earlier
         async componentDidMount() {
           const user = await fetchUser()
           const bookmarks = await fetchBookmarks(user)
@@ -236,6 +245,7 @@
                 )}
               />
               <Create create={create} />
+              {/* having a switch with 1 route seems silly...*/}
               <Switch>
                 <Route
                   path={"/:filter?"}
