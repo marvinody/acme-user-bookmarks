@@ -71,34 +71,34 @@
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const API = "https://acme-users-api-rev.herokuapp.com/api";
+      const API = "https://acme-users-api-rev.herokuapp.com/api"
 
       // returns a promise for a 'logged-in' user
       const fetchUser = async () => {
-        const storage = window.localStorage;
-        const userId = storage.getItem("userId");
+        const storage = window.localStorage
+        const userId = storage.getItem("userId")
         if (userId) {
           try {
-            return (await axios.get(`${API}/users/detail/${userId}`)).data;
+            return (await axios.get(`${API}/users/detail/${userId}`)).data
           } catch (ex) {
-            storage.removeItem("userId");
-            return fetchUser();
+            storage.removeItem("userId")
+            return fetchUser()
           }
         }
-        const user = (await axios.get(`${API}/users/random`)).data;
-        storage.setItem("userId", user.id);
-        return user;
-      };
+        const user = (await axios.get(`${API}/users/random`)).data
+        storage.setItem("userId", user.id)
+        return user
+      }
 
-      const { render } = ReactDOM;
-      const { Component } = React;
-      const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM;
+      const { render } = ReactDOM
+      const { Component } = React
+      const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM
 
       const List = ({ bookMarks, match, destroy, create, history }) => {
-        console.log(history);
+        console.log(history)
         let arrayToList = bookMarks.filter(bookmark => {
-          return bookmark.category === match.params.filter;
-        });
+          return bookmark.category === match.params.filter
+        })
 
         return (
           <div id="form">
@@ -114,26 +114,26 @@
                         destroy
                       </button>
                     </div>
-                  );
+                  )
                 })}
               </ul>
             </div>
           </div>
-        );
-      };
+        )
+      }
 
       const Nav = ({ path, bookMarks }) => {
-        let navArray = [];
-        let unuqArray = [];
+        let navArray = []
+        let unuqArray = []
         bookMarks.map(bookmark => {
-          navArray.push(bookmark.category);
-        });
+          navArray.push(bookmark.category)
+        })
         let navObject = navArray.reduce((col, val) => {
-          col[val] = (col[val] || 0) + 1;
-          return col;
-        }, {});
+          col[val] = (col[val] || 0) + 1
+          return col
+        }, {})
 
-        let arrayOfNav = Object.entries(navObject);
+        let arrayOfNav = Object.entries(navObject)
         return (
           <nav>
             {arrayOfNav.map((item, ind) => {
@@ -154,30 +154,30 @@
                     {item[0]} ({item[1]})
                   </Link>
                 </div>
-              );
+              )
             })}
           </nav>
-        );
-      };
+        )
+      }
 
       class Form extends Component {
         constructor() {
-          super();
+          super()
           this.state = {
             category: "type here",
-            url: "type here"
-          };
-          this.clear = this.clear.bind(this);
+            url: "type here",
+          }
+          this.clear = this.clear.bind(this)
         }
         clear() {
-          this.setState({ category: "", url: "" });
+          this.setState({ category: "", url: "" })
         }
         render() {
-          const { category, url } = this.state;
-          const { clear } = this;
+          const { category, url } = this.state
+          const { clear } = this
           const onSubmit = ev => {
-            ev.preventDefault();
-          };
+            ev.preventDefault()
+          }
           return (
             <form onSubmit={onSubmit} className="forms">
               CATEGORY (any name)
@@ -201,68 +201,68 @@
               </button>
               <button onClick={() => clear()}>Clear</button>
             </form>
-          );
+          )
         }
       }
 
       class App extends Component {
         constructor() {
-          super();
+          super()
           this.state = {
             user: {},
-            bookMarks: []
-          };
-          this.destroy = this.destroy.bind(this);
-          this.create = this.create.bind(this);
+            bookMarks: [],
+          }
+          this.destroy = this.destroy.bind(this)
+          this.create = this.create.bind(this)
         }
 
         async create(category, url, history) {
-          const cat = `/${category}`;
+          const cat = `/${category}`
           // if (category) {
           //   history.push(`/${category}`);
           // }
-          history.push(cat);
-          const { bookMarks } = this.state;
-          const userid = window.localStorage.getItem("userId");
+          history.push(cat)
+          const { bookMarks } = this.state
+          const userid = window.localStorage.getItem("userId")
           await axios
             .post(`${API}/users/${userid}/bookmarks`, {
               category: category,
               url: url,
-              rating: 5
+              rating: 5,
             })
-            .catch(ex => alert(ex, "probably incorect URL"));
+            .catch(ex => alert(ex, "probably incorect URL"))
           await axios
             .get(`${API}/users/${userid}/bookmarks`)
             .then(res => this.setState({ bookMarks: res.data }))
-            .catch(ex => alert(ex.message));
+            .catch(ex => alert(ex.message))
         }
 
         async destroy(ev, id) {
-          const { bookMarks } = this.state;
-          const userid = window.localStorage.getItem("userId");
+          const { bookMarks } = this.state
+          const userid = window.localStorage.getItem("userId")
           await axios
             .delete(`${API}/users/${userid}/bookmarks/${id}`)
-            .catch(ex => alert(ex.message));
+            .catch(ex => alert(ex.message))
           await axios
             .get(`${API}/users/${userid}/bookmarks`)
             .then(res => this.setState({ bookMarks: res.data }))
-            .catch(ex => alert(ex.message));
+            .catch(ex => alert(ex.message))
         }
 
         async componentDidMount() {
-          fetchUser();
-          const userid = window.localStorage.getItem("userId");
+          fetchUser()
+          const userid = window.localStorage.getItem("userId")
           const user = await axios
             .get(`${API}/users/detail/${userid}`)
-            .catch(ex => alert(ex.message));
+            .catch(ex => alert(ex.message))
           const bookMarks = await axios
             .get(`${API}/users/${userid}/bookmarks`)
-            .catch(ex => alert(ex.message));
-          this.setState({ user: user.data, bookMarks: bookMarks.data });
+            .catch(ex => alert(ex.message))
+          this.setState({ user: user.data, bookMarks: bookMarks.data })
         }
         render() {
-          const { user, bookMarks } = this.state;
-          const { destroy, create } = this;
+          const { user, bookMarks } = this.state
+          const { destroy, create } = this
 
           return (
             <div>
@@ -274,7 +274,7 @@
                   render={({ location }) => {
                     return (
                       <Nav path={location.pathname} bookMarks={bookMarks} />
-                    );
+                    )
                   }}
                 />
                 <Route
@@ -300,11 +300,11 @@
               </HashRouter>
               <div></div>
             </div>
-          );
+          )
         }
       }
-      const root = document.querySelector("#root");
-      render(<App />, root);
+      const root = document.querySelector("#root")
+      render(<App />, root)
     </script>
   </body>
 </html>
