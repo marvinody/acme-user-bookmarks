@@ -1,181 +1,221 @@
 <html>
   <head>
-<style>
-  body {
-    font-family: verdana;
-  }
+    <style>
+      body {
+        font-family: verdana;
+      }
 
-  main {
-    margin: 0.5rem;
-    padding: 0.5rem;
-  }
+      main {
+        margin: 0.5rem;
+        padding: 0.5rem;
+      }
 
-  nav {
-    height: 3rem;
-    margin: 1rem 0;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-  }
+      nav {
+        height: 3rem;
+        margin: 1rem 0;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
 
-  nav a {
-    height: 2rem;
-    padding: 0.3rem;
-  }
+      nav a {
+        height: 2rem;
+        padding: 0.3rem;
+      }
 
-  .selected {
-    background-color: cadetblue;
-    color: white;
-    border: solid 1px black;
-  }
+      .selected {
+        background-color: cadetblue;
+        color: white;
+        border: solid 1px black;
+      }
 
-  form {
-    display: flex;
-    border: solid 1px gray;
-    flex-direction: column;
-    height: 8rem;
-  }
+      form {
+        display: flex;
+        border: solid 1px gray;
+        flex-direction: column;
+        height: 8rem;
+      }
 
-  form input {
-    margin-top: 1rem;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-  }
+      form input {
+        margin-top: 1rem;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+      }
 
-  form button {
-    margin-top: 1rem;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-    background-color: lightgray;
-    height: 1.5rem;
-  }
+      form button {
+        margin-top: 1rem;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        background-color: lightgray;
+        height: 1.5rem;
+      }
 
-  ul {
-    list-style-type: none;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin: 0.5rem 0;
-    padding: 0.5rem 0;
-    flex: warp;
-  }
+      ul {
+        list-style-type: none;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin: 0.5rem 0;
+        padding: 0.5rem 0;
+        flex: warp;
+      }
 
-  li {
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    flex: 1;
-    margin: 0.5rem 0;
+      li {
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        flex: 1;
+        margin: 0.5rem 0;
+      }
 
-  }
+      li a {
+        flex: 1;
+        text-align: left;
+        color: blue;
+      }
 
-  li a {
-    flex: 1;
-    text-align: left;
-    color: blue;
-  }
-
-  ul button {
-    border: solid gray 1px;
-    background-color: lightgray;
-    flex: 1;
-  }
-
-</style>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js'></script>
+      ul button {
+        border: solid gray 1px;
+        background-color: lightgray;
+        flex: 1;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.0/react-router-dom.js'></script>
+    <script
+      src="https://unpkg.com/react@16/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.0/react-router-dom.js"></script>
   </head>
   <body>
-    <div id='root'></div>
-    <script type='text/babel'>
-      const { render } = ReactDOM;
-      const { Component } = React;
-      const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM;
-      const API = 'https://acme-users-api-rev.herokuapp.com/api';
+    <div id="root"></div>
+    <script type="text/babel">
+      const { render } = ReactDOM
+      const { Component } = React
+      const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM
+      const API = "https://acme-users-api-rev.herokuapp.com/api"
 
-      const fetchUser = async ()=> {
-        const storage = window.localStorage;
-        const userId = storage.getItem('userId');
-        if(userId){
+      const fetchUser = async () => {
+        const storage = window.localStorage
+        const userId = storage.getItem("userId")
+        if (userId) {
           try {
-            return (await axios.get(`${API}/users/detail/${userId}`)).data;
-          }
-          catch(ex){
-            storage.removeItem('userId');
-            return fetchUser();
+            return (await axios.get(`${API}/users/detail/${userId}`)).data
+          } catch (ex) {
+            storage.removeItem("userId")
+            return fetchUser()
           }
         }
-        const user = (await axios.get(`${API}/users/random`)).data;
-        storage.setItem('userId', user.id);
-        return  user;
-      };
+        const user = (await axios.get(`${API}/users/random`)).data
+        storage.setItem("userId", user.id)
+        return user
+      }
 
-      const Header = ({user, bookmarks}) => {
+      const Header = ({ user, bookmarks }) => {
         return (
-          <h1>{user.fullName} ({bookmarks.length} Bookmarks)</h1>
+          <h1>
+            {user.fullName} ({bookmarks.length} Bookmarks)
+          </h1>
         )
       }
 
-      const Nav = ({ path, bookmarks })=> {
-        const entertainment = bookmarks.filter( bookmark => bookmark.category === 'entertainment');
-        const shopping = bookmarks.filter( bookmark => bookmark.category === 'shopping');
-        const news = bookmarks.filter( bookmark => bookmark.category === 'news');
-        const search = bookmarks.filter( bookmark => bookmark.category === 'search');
+      const Nav = ({ path, bookmarks }) => {
+        const entertainment = bookmarks.filter(
+          bookmark => bookmark.category === "entertainment"
+        )
+        const shopping = bookmarks.filter(
+          bookmark => bookmark.category === "shopping"
+        )
+        const news = bookmarks.filter(bookmark => bookmark.category === "news")
+        const search = bookmarks.filter(
+          bookmark => bookmark.category === "search"
+        )
 
         return (
           <nav>
-            <Link to='/entertainment' className={ path === '/entertainment' ? 'selected': ''}>ENTERTAINMENT ({ entertainment.length })</Link>
-            <Link to='/shopping' className={ path === '/shopping' ? 'selected': ''}>SHOPPING ({ shopping.length })</Link>
-            <Link to='/news' className={ path === '/news' ? 'selected': ''}>NEWS ({ news.length })</Link>
-            <Link to='/search' className={ path === '/search' ? 'selected': ''}>SEARCH ({ search.length })</Link>
+            <Link
+              to="/entertainment"
+              className={path === "/entertainment" ? "selected" : ""}
+            >
+              ENTERTAINMENT ({entertainment.length})
+            </Link>
+            <Link
+              to="/shopping"
+              className={path === "/shopping" ? "selected" : ""}
+            >
+              SHOPPING ({shopping.length})
+            </Link>
+            <Link to="/news" className={path === "/news" ? "selected" : ""}>
+              NEWS ({news.length})
+            </Link>
+            <Link to="/search" className={path === "/search" ? "selected" : ""}>
+              SEARCH ({search.length})
+            </Link>
           </nav>
-        );
-      };
+        )
+      }
 
-      const Bookmarks = ({ path, bookmarks, destroy })=> {
+      const Bookmarks = ({ path, bookmarks, destroy }) => {
         return (
           <ul>
-            {
-              bookmarks.filter(bookmark => bookmark.category === path.slice(1) ).map( bookmark =>
-               <li
-                key={ bookmark.id }>
-                  <a href = {bookmark.url} target='_blank'>{ bookmark.url}</a>
-                  <button onClick={ ()=> destroy(bookmark)}>Destroy</button>
-              </li>)
-            }
+            {bookmarks
+              .filter(bookmark => bookmark.category === path.slice(1))
+              .map(bookmark => (
+                <li key={bookmark.id}>
+                  <a href={bookmark.url} target="_blank">
+                    {bookmark.url}
+                  </a>
+                  <button onClick={() => destroy(bookmark)}>Destroy</button>
+                </li>
+              ))}
           </ul>
-        );
-      };
+        )
+      }
 
-      class Create extends Component{
-        constructor(){
-          super();
+      class Create extends Component {
+        constructor() {
+          super()
           this.state = {
-            url: '',
-            category: '',
-            error: ''
-          };
-          this.create = this.create.bind(this);
+            url: "",
+            category: "",
+            error: "",
+          }
+          this.create = this.create.bind(this)
         }
-        create(){
-          this.props.create({ url: this.state.url, category: this.state.category })
+        create() {
+          this.props.create({
+            url: this.state.url,
+            category: this.state.category,
+          })
         }
 
-        render(){
-          const { url, category, error } = this.state;
-          const { create } = this;
+        render() {
+          const { url, category, error } = this.state
+          const { create } = this
           return (
-            <form onSubmit = { ev => ev.preventDefault() }>
-              { !!error && <div className='error'>{error }</div>  }
-              <input value={ url } placeholder='url' onChange={ (ev)=> this.setState({ url: ev.target.value }) }/>
-              <input value={ category } placeholder='category' onChange={ (ev)=> this.setState({ category: ev.target.value }) }/>
-              <button disabled={ !url || !category } onClick={ create }>Create</button>
+            <form onSubmit={ev => ev.preventDefault()}>
+              {!!error && <div className="error">{error}</div>}
+              <input
+                value={url}
+                placeholder="url"
+                onChange={ev => this.setState({ url: ev.target.value })}
+              />
+              <input
+                value={category}
+                placeholder="category"
+                onChange={ev => this.setState({ category: ev.target.value })}
+              />
+              <button disabled={!url || !category} onClick={create}>
+                Create
+              </button>
             </form>
-          );
+          )
         }
       }
 
@@ -184,48 +224,101 @@
           super()
           this.state = {
             user: {},
-            bookmarks: []
-          };
-          this.create = this.create.bind(this);
-          this.destroy = this.destroy.bind(this);
+            bookmarks: [],
+          }
+          this.create = this.create.bind(this)
+          this.destroy = this.destroy.bind(this)
         }
 
         async componentDidMount() {
-          const user = await fetchUser();
-          const bookmarks = (await axios.get(`${API}/users/${ user.id }/bookmarks`)).data;
-          this.setState({user, bookmarks});
+          const user = await fetchUser()
+          const bookmarks = (
+            await axios.get(`${API}/users/${user.id}/bookmarks`)
+          ).data
+          this.setState({ user, bookmarks })
         }
 
-        async create(bookmark){
-          const created = (await axios.post(`${API}/users/${this.state.user.id}/bookmarks`, bookmark)).data;
-          const bookmarks = [...this.state.bookmarks, created ];
-          this.setState({ bookmarks });
+        async create(bookmark) {
+          const created = (
+            await axios.post(
+              `${API}/users/${this.state.user.id}/bookmarks`,
+              bookmark
+            )
+          ).data
+          const bookmarks = [...this.state.bookmarks, created]
+          this.setState({ bookmarks })
         }
 
-        async destroy(bookmark){
-          await axios.delete(`${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`);
-          this.setState({ bookmarks : this.state.bookmarks.filter( _bookmark => _bookmark.id !== bookmark.id)});
+        async destroy(bookmark) {
+          await axios.delete(
+            `${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`
+          )
+          this.setState({
+            bookmarks: this.state.bookmarks.filter(
+              _bookmark => _bookmark.id !== bookmark.id
+            ),
+          })
         }
 
         render() {
-          const {user, bookmarks} = this.state;
-          const {create, destroy} = this;
+          const { user, bookmarks } = this.state
+          const { create, destroy } = this
 
           return (
             <main>
               <HashRouter>
-                <Header user = {user} bookmarks = {bookmarks}/>
-                <Route render={ ({ location })=> <Nav path={ location.pathname } bookmarks = {bookmarks} />} />
-                <Create  create= {create}/>
+                <Header user={user} bookmarks={bookmarks} />
+                <Route
+                  render={({ location }) => (
+                    <Nav path={location.pathname} bookmarks={bookmarks} />
+                  )}
+                />
+                <Create create={create} />
                 <Switch>
-                  <Route exact path='/entertainment' render={ ({ location })=>
-                   <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />
-                  <Route exact path='/shopping' render={ ({ location })=>
-                   <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />
-                  <Route exact path='/news' render={ ({ location })=>
-                   <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />
-                  <Route exact path='/search' render={ ({ location })=>
-                   <Bookmarks path={ location.pathname } bookmarks={ bookmarks } destroy = {destroy}/> } />
+                  <Route
+                    exact
+                    path="/entertainment"
+                    render={({ location }) => (
+                      <Bookmarks
+                        path={location.pathname}
+                        bookmarks={bookmarks}
+                        destroy={destroy}
+                      />
+                    )}
+                  />
+                  <Route
+                    exact
+                    path="/shopping"
+                    render={({ location }) => (
+                      <Bookmarks
+                        path={location.pathname}
+                        bookmarks={bookmarks}
+                        destroy={destroy}
+                      />
+                    )}
+                  />
+                  <Route
+                    exact
+                    path="/news"
+                    render={({ location }) => (
+                      <Bookmarks
+                        path={location.pathname}
+                        bookmarks={bookmarks}
+                        destroy={destroy}
+                      />
+                    )}
+                  />
+                  <Route
+                    exact
+                    path="/search"
+                    render={({ location }) => (
+                      <Bookmarks
+                        path={location.pathname}
+                        bookmarks={bookmarks}
+                        destroy={destroy}
+                      />
+                    )}
+                  />
                 </Switch>
               </HashRouter>
             </main>
@@ -233,10 +326,8 @@
         }
       }
 
-      const root = document.querySelector('#root');
-      render(<App />, root);
+      const root = document.querySelector("#root")
+      render(<App />, root)
     </script>
   </body>
 </html>
-
-
