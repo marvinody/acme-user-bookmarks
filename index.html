@@ -62,35 +62,35 @@
     <div id="root"></div>
 
     <script type="text/babel">
-      const { Component } = React;
-      const { render } = ReactDOM;
-      const { HashRouter, Link, Route, Switch, Redirect } = ReactRouterDOM;
-      const API = "https://acme-users-api-rev.herokuapp.com/api";
+      const { Component } = React
+      const { render } = ReactDOM
+      const { HashRouter, Link, Route, Switch, Redirect } = ReactRouterDOM
+      const API = "https://acme-users-api-rev.herokuapp.com/api"
 
       const fetchUser = async () => {
-        const storage = window.localStorage;
-        const userId = storage.getItem("userId");
+        const storage = window.localStorage
+        const userId = storage.getItem("userId")
         if (userId) {
           try {
-            return (await axios.get(`${API}/users/detail/${userId}`)).data;
+            return (await axios.get(`${API}/users/detail/${userId}`)).data
           } catch (ex) {
-            storage.removeItem("userId");
-            return fetchUser();
+            storage.removeItem("userId")
+            return fetchUser()
           }
         }
-        const user = (await axios.get(`${API}/users/random`)).data;
-        storage.setItem("userId", user.id);
-        return user;
-      };
+        const user = (await axios.get(`${API}/users/random`)).data
+        storage.setItem("userId", user.id)
+        return user
+      }
 
       const Bookmarks = ({ bookmarks, destroy, match, history }) => {
-        const filter = match.params.filter;
+        const filter = match.params.filter
         if (filter) {
           bookmarks = bookmarks.filter(bookmark => {
             if (filter === bookmark.category) {
-              return bookmark;
+              return bookmark
             }
-          });
+          })
         }
         return (
           <ul className="list">
@@ -106,18 +106,18 @@
               </li>
             ))}
           </ul>
-        );
-      };
+        )
+      }
 
       const Nav = ({ bookmarks, match }) => {
-        const filter = match.params.filter;
-        const categories = [];
+        const filter = match.params.filter
+        const categories = []
 
         bookmarks.filter(bookmark => {
           if (!categories.includes(bookmark.category)) {
-            categories.push(bookmark.category);
+            categories.push(bookmark.category)
           }
-        });
+        })
         return (
           <nav>
             {categories.map((category, idx) => (
@@ -135,23 +135,23 @@
               </Link>
             ))}
           </nav>
-        );
-      };
+        )
+      }
 
       class Form extends Component {
         constructor() {
-          super();
+          super()
           this.state = {
             url: "",
-            category: ""
-          };
+            category: "",
+          }
         }
         render() {
-          const { url, category } = this.state;
+          const { url, category } = this.state
           const onSubmit = ev => {
-            ev.preventDefault();
-            this.props.create({ url, category }, this.props.history);
-          };
+            ev.preventDefault()
+            this.props.create({ url, category }, this.props.history)
+          }
           return (
             <div className="form">
               <form onSubmit={onSubmit}>
@@ -181,27 +181,27 @@
                 </button>
               </form>
             </div>
-          );
+          )
         }
       }
 
       class App extends Component {
         constructor() {
-          super();
+          super()
           this.state = {
             user: {},
-            bookmarks: []
-          };
-          this.create = this.create.bind(this);
-          this.destroy = this.destroy.bind(this);
+            bookmarks: [],
+          }
+          this.create = this.create.bind(this)
+          this.destroy = this.destroy.bind(this)
         }
 
         async componentDidMount() {
-          const user = await fetchUser();
+          const user = await fetchUser()
           const bookmarks = (
             await axios.get(`${API}/users/${user.id}/bookmarks`)
-          ).data;
-          this.setState({ user, bookmarks });
+          ).data
+          this.setState({ user, bookmarks })
         }
 
         async create(bookmark, history) {
@@ -209,28 +209,28 @@
             await axios.post(`${API}/users/${this.state.user.id}/bookmarks`, {
               category: bookmark.category,
               url: bookmark.url,
-              rating: 5
+              rating: 5,
             })
-          ).data;
+          ).data
 
-          this.setState({ bookmarks: [...this.state.bookmarks, created] });
-          history.push(`/${created.category}`);
+          this.setState({ bookmarks: [...this.state.bookmarks, created] })
+          history.push(`/${created.category}`)
         }
 
         async destroy(bookmark, history) {
           await axios.delete(
             `${API}/users/${this.state.user.id}/bookmarks/${bookmark}`
-          );
+          )
           this.setState({
             bookmarks: this.state.bookmarks.filter(
               _bookmark => _bookmark.id !== bookmark
-            )
-          });
+            ),
+          })
         }
 
         render() {
-          const { user, bookmarks } = this.state;
-          const { create, destroy } = this;
+          const { user, bookmarks } = this.state
+          const { create, destroy } = this
 
           return (
             <HashRouter>
@@ -265,12 +265,12 @@
                 />
               </Switch>
             </HashRouter>
-          );
+          )
         }
       }
 
-      const root = document.querySelector("#root");
-      ReactDOM.render(<App />, root);
+      const root = document.querySelector("#root")
+      ReactDOM.render(<App />, root)
     </script>
   </body>
 </html>
