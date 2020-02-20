@@ -1,46 +1,46 @@
-const { Component } = React;
-const { HashRouter, Link, Route, Switch, Redirect } = ReactRouterDOM;
-const { render } = ReactDOM;
+const { Component } = React
+const { HashRouter, Link, Route, Switch, Redirect } = ReactRouterDOM
+const { render } = ReactDOM
 
-const API = 'https://acme-users-api-rev.herokuapp.com/api';
+const API = 'https://acme-users-api-rev.herokuapp.com/api'
 
 const fetchUser = async () => {
-  const storage = window.localStorage;
-  const userID = storage.getItem('userID');
+  const storage = window.localStorage
+  const userID = storage.getItem('userID')
   if (userID) {
     try {
-      return (await axios.get(`${API}/users/detail/${userID}`)).data;
+      return (await axios.get(`${API}/users/detail/${userID}`)).data
     } catch (ex) {
-      storage.removeItem('userID');
-      return fetchUser();
+      storage.removeItem('userID')
+      return fetchUser()
     }
   }
 
-  const user = (await axios.get(`${API}/users/random`)).data;
-  storage.setItem('userID', user.id);
+  const user = (await axios.get(`${API}/users/random`)).data
+  storage.setItem('userID', user.id)
 
-  return user;
-};
+  return user
+}
 
 const fetchBookmark = async (user) => {
-  const bookmark = (await axios.get(`${API}/users/${user}/bookmarks`)).data;
+  const bookmark = (await axios.get(`${API}/users/${user}/bookmarks`)).data
 
-  return bookmark;
-};
+  return bookmark
+}
 
 const mapBookmark = (bookmark) => {
   return bookmark.reduce((accum, cur) => {
     if (accum[cur.category]) {
-      accum[cur.category] = accum[cur.category] + 1;
+      accum[cur.category] = accum[cur.category] + 1
     } else {
-      accum[cur.category] = 1;
+      accum[cur.category] = 1
     }
-    return accum;
-  }, {});
-};
+    return accum
+  }, {})
+}
 
 const Nav = ({ path, bookmarks }) => {
-  const titles = Object.keys(bookmarks);
+  const titles = Object.keys(bookmarks)
 
   return (
     <nav>
@@ -53,20 +53,20 @@ const Nav = ({ path, bookmarks }) => {
           >
             {`${title.toUpperCase()} (${bookmarks[title]})`}
           </Link>
-        );
+        )
       })}
     </nav>
-  );
-};
+  )
+}
 
 const List = ({ user, bookmarks, path, destroy }) => {
   return (
     <ul>
       {bookmarks
         .filter((cur) => {
-          const url = path.slice(1);
+          const url = path.slice(1)
           if (cur.category === url) {
-            return cur;
+            return cur
           }
         })
         .map((bookmark) => {
@@ -83,20 +83,20 @@ const List = ({ user, bookmarks, path, destroy }) => {
               </a>
               <button
                 onClick={async () => {
-                  await destroy(bookmark.id);
+                  await destroy(bookmark.id)
                 }}
               >
                 Destroy
               </button>
             </li>
-          );
+          )
         })}
     </ul>
-  );
-};
+  )
+}
 class App extends Component {
   constructor() {
-    super();
+    super()
     this.state = {
       user: {},
       bookmarks: [],
@@ -104,16 +104,16 @@ class App extends Component {
       inputUrl: '',
       inputCat: '',
       inputRate: 0
-    };
+    }
 
-    this.destroy = this.destroy.bind(this);
-    this.create = this.create.bind(this);
+    this.destroy = this.destroy.bind(this)
+    this.create = this.create.bind(this)
   }
 
   async componentDidMount() {
-    this.setState({ user: await fetchUser() });
-    this.setState({ bookmarks: await fetchBookmark(this.state.user.id) });
-    this.setState({ navBookmark: mapBookmark(this.state.bookmarks) });
+    this.setState({ user: await fetchUser() })
+    this.setState({ bookmarks: await fetchBookmark(this.state.user.id) })
+    this.setState({ navBookmark: mapBookmark(this.state.bookmarks) })
   }
 
   async create(userUrl, userCategory, userRating) {
@@ -121,17 +121,17 @@ class App extends Component {
       category: userCategory,
       url: userUrl,
       rating: userRating
-    });
-    this.setState({ bookmarks: await fetchBookmark(this.state.user.id) });
-    this.setState({ navBookmark: mapBookmark(this.state.bookmarks) });
+    })
+    this.setState({ bookmarks: await fetchBookmark(this.state.user.id) })
+    this.setState({ navBookmark: mapBookmark(this.state.bookmarks) })
   }
 
   async destroy(bookmarkID) {
     await axios.delete(
       `${API}/users/${this.state.user.id}/bookmarks/${bookmarkID}`
-    );
-    this.setState({ bookmarks: await fetchBookmark(this.state.user.id) });
-    this.setState({ navBookmark: mapBookmark(this.state.bookmarks) });
+    )
+    this.setState({ bookmarks: await fetchBookmark(this.state.user.id) })
+    this.setState({ navBookmark: mapBookmark(this.state.bookmarks) })
   }
 
   render() {
@@ -142,11 +142,11 @@ class App extends Component {
       inputUrl,
       inputCat,
       inputRate
-    } = this.state;
-    const { destroy, create } = this;
+    } = this.state
+    const { destroy, create } = this
 
     if (bookmarks.length === 10) {
-      alert('This is your last bookmark to add more please remove a bookmark');
+      alert('This is your last bookmark to add more please remove a bookmark')
     }
     return (
       <div>
@@ -156,10 +156,10 @@ class App extends Component {
             <Route
               render={({ location }) => {
                 return (
-                  <Nav path={location.pathname} bookmarks={navBookmark}></Nav>
-                );
+                  <Nav path={location.pathname} bookmarks={navBookmark} />
+                )
               }}
-            ></Route>
+            />
           </Switch>
         </HashRouter>
         <form>
@@ -175,7 +175,7 @@ class App extends Component {
           />
           <button
             onClick={async () => {
-              await create(inputUrl, inputCat, inputRate);
+              await create(inputUrl, inputCat, inputRate)
             }}
           >
             Create
@@ -189,11 +189,11 @@ class App extends Component {
                 user={user}
                 path={location.pathname}
                 destroy={destroy}
-              ></List>
+              />
             )}
           />
         </HashRouter>
       </div>
-    );
+    )
   }
 }
