@@ -143,6 +143,9 @@
                     <button
                       history={history}
                       onClick={function() {
+                        // this seems very complex logic
+                        // try to keep your on clicks fairly simple
+                        // don't be afraid to make class method and pass stuff
                         if (
                           bookmarks.filter(
                             bm => bm.category === bookmark.category
@@ -184,7 +187,13 @@
           this.setState({ user, bookmarks })
         }
         async create({ url, category, error }) {
+          // hmm, good check. hadn't thought of this requirement before
           if (this.state.bookmarks.find(bm => bm.url === url)) {
+            // generally when you do something likethis
+            // I've seen just throw new Error("message here")
+            // your way is fine but just a heads up
+            // also, you're not doing anything with it
+            // should catch error and display to user or something
             const ex = new Error("That URL is already bookmarked!")
             throw ex
           }
@@ -195,6 +204,7 @@
               error,
             })
           ).data
+          // good
           const bookmarks = [...this.state.bookmarks, created]
           this.setState({ bookmarks })
         }
@@ -202,6 +212,7 @@
           await axios.delete(
             `${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`
           )
+          // good
           this.setState({
             bookmarks: this.state.bookmarks.filter(bm => bm.id !== bookmark.id),
           })
@@ -218,8 +229,14 @@
               acc[bookmark.category] = 1
               return acc
             }, {})
+            // nice chains
+            // this is a little bit of a complex data strucutre
+            // a nested array
+            // giving a quick comment before the assignment helps later!
           ).map(cat => [cat[0].toUpperCase(), cat[1]])
 
+          // hmmmmm, I think there's a better way to do this
+          // maybe using a <Redirect />
           if (location.hash.slice(1) === "/" && bookmarks.length > 0) {
             location.hash = `/${bookmarks[0].category.toUpperCase()}`
           }
