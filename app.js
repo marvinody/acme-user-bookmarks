@@ -21,12 +21,12 @@ const fetchUser = async () => {
   return user
 }
 
-
+// I like imitating functions you have
 const fetchBookmarks = async userId => {
   return (await axios.get(`${API}/users/${userId}/bookmarks`)).data
 }
 
-
+// good function!
 const createCategories = bookmarks => {
   const categories = bookmarks.reduce((acc, bookmark) => {
     if (!acc.hasOwnProperty(bookmark.category)) {
@@ -38,6 +38,7 @@ const createCategories = bookmarks => {
     return acc
   }, {})
   categories.all = bookmarks.length
+  // yes! it looks ok! makes sense
   // my attempt at getting the numbers to show next to nav bar categories
   return categories
 }
@@ -52,8 +53,10 @@ const Nav = ({ path, categories }) => {
       {currCategories.map(cat => {
         return (
           <div key={cat} className={path === `/${cat}` ? 'selected' : ''}>
+            {/* just need to remove the slash from cat! */}
             {/* the selected className isnt being added properly */}
             <nav>
+              {/* very close to it, I think doing something like currCats[cat] would give you length */}
               <Link to={`/${cat}`} >{cat} ()</Link>
             </nav>
           </div>
@@ -79,12 +82,16 @@ class CreateBookmark extends Component {
     this.props
       .create(bookmark)
       .then(() => this.props.history.push(`/${category}`))
+      // what was the point of this line?
       .then(this.setState({ category: `${category}`, url: `${url}` }))
   }
 
   render() {
     const { url, category } = this.state
     return (
+      // in your form submit, you probably wanna do the this.createNew call here too
+      // AFTER the preventDefault
+      // but don't attach it to the click
       <form id="createBookmark" onSubmit={ev => ev.preventDefault()}>
         <input
           name="url"
@@ -100,6 +107,9 @@ class CreateBookmark extends Component {
         />
         <button
           disabled={!url || !category ? 'disabled' : ''}
+          // this click. don't do this
+          // I can hit enter and nothing will happen. Enter generally submits a form
+          // you're breaking my ux!
           onClick={() => { this.createNew(category, url) }}>
           Create
         </button>
@@ -115,12 +125,14 @@ const Bookmarks = ({ path, bookmarks, destroy }) => {
       return (
         <li className="bookmarks" key={bookmark.id}>
           <a href={`${bookmark.url}`} target="_blank">{bookmark.url}</a>
+          {/* this is fine for onclick */}
           <button onClick={() => { destroy(bookmark) }}>Destory</button>
         </li>
       )
     })
   }
   // console.log(path)
+  // works!
   if (path === 'all') {
     return <ul>{renderBookmarks(bookmarks)}</ul>
   }
@@ -147,7 +159,13 @@ class App extends Component {
 
   async componentDidMount() {
     const user = await fetchUser()
+    // don't need parens here
     const bookmarks = (await fetchBookmarks(user.id))
+    // so categories is a derived value
+    // meaning we can figure out categories from stuff in state
+    // which means it probably shouldn't be immediately in state
+    // cause in the render, we can use bookmarks and gen it!
+    // we can talk about why this is an antipattern if you want
     const categories = createCategories(bookmarks)
     this.setState({ bookmarks, user, categories })
   }
@@ -191,7 +209,9 @@ class App extends Component {
   }
 }
 
+// the state SHOULD reset on a reload
 // also why doesnt the state reset on a hard reset or relaod?
+// this generally means your setstate is wonky, I think we went over this but I can't recall
 // Have to refresh after creating, not sure why
 
 
