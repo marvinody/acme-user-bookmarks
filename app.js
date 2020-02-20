@@ -22,12 +22,15 @@ const fetchUser = async () => {
   return user
 }
 
+// good use of using similar styles in code
 const fetchBookmark = async (user) => {
   const bookmark = (await axios.get(`${API}/users/${user}/bookmarks`)).data
 
   return bookmark
 }
 
+// good function
+// but the name could be better
 const mapBookmark = (bookmark) => {
   return bookmark.reduce((accum, cur) => {
     if (accum[cur.category]) {
@@ -63,6 +66,7 @@ const List = ({ user, bookmarks, path, destroy }) => {
   return (
     <ul>
       {bookmarks
+        // nice chaining!
         .filter((cur) => {
           const url = path.slice(1)
           if (cur.category === url) {
@@ -82,6 +86,9 @@ const List = ({ user, bookmarks, path, destroy }) => {
                 {bookmark.url}
               </a>
               <button
+                // even though destroy returns a promise
+                // you don't need to await it!
+                // you can just invoke it and let it do its thing
                 onClick={async () => {
                   await destroy(bookmark.id)
                 }}
@@ -110,6 +117,9 @@ class App extends Component {
     this.create = this.create.bind(this)
   }
 
+  // should try to batch setState calls if possible
+  // setState does some weird things and you may lead into bugs if you use
+  // this.state IN your setState
   async componentDidMount() {
     this.setState({ user: await fetchUser() })
     this.setState({ bookmarks: await fetchBookmark(this.state.user.id) })
@@ -117,19 +127,25 @@ class App extends Component {
   }
 
   async create(userUrl, userCategory, userRating) {
+    // post returns something here. can you do something with that?
     await axios.post(`${API}/users/${this.state.user.id}/bookmarks`, {
       category: userCategory,
       url: userUrl,
       rating: userRating
     })
+    // you're just refetching everything again. what if you had 1000 things
+    //  and you just reloaded everything
+    // ouch
     this.setState({ bookmarks: await fetchBookmark(this.state.user.id) })
     this.setState({ navBookmark: mapBookmark(this.state.bookmarks) })
   }
 
   async destroy(bookmarkID) {
+    // this is ok tho. delete doesn't return anything
     await axios.delete(
       `${API}/users/${this.state.user.id}/bookmarks/${bookmarkID}`
     )
+    // but there's a way to make this more efficient
     this.setState({ bookmarks: await fetchBookmark(this.state.user.id) })
     this.setState({ navBookmark: mapBookmark(this.state.bookmarks) })
   }
