@@ -3,33 +3,39 @@
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script
+      src="https://unpkg.com/react@16/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
+      crossorigin
+    ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.0/react-router-dom.js"></script>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const API = "https://acme-users-api-rev.herokuapp.com/api";
-      const { render } = ReactDOM;
-      const { Component } = React;
-      const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM;
+      const API = "https://acme-users-api-rev.herokuapp.com/api"
+      const { render } = ReactDOM
+      const { Component } = React
+      const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM
 
       const fetchUser = async () => {
-        const storage = window.localStorage;
-        const userId = storage.getItem("userId");
+        const storage = window.localStorage
+        const userId = storage.getItem("userId")
         if (userId) {
           try {
-            return (await axios.get(`${API}/users/detail/${userId}`)).data;
+            return (await axios.get(`${API}/users/detail/${userId}`)).data
           } catch (ex) {
-            storage.removeItem("userId");
-            return fetchUser();
+            storage.removeItem("userId")
+            return fetchUser()
           }
         }
-        const user = (await axios.get(`${API}/users/random`)).data;
-        storage.setItem("userId", user.id);
-        return user;
-      };
+        const user = (await axios.get(`${API}/users/random`)).data
+        storage.setItem("userId", user.id)
+        return user
+      }
       //
       //
       //
@@ -42,63 +48,86 @@
             <nav>
               {categories.map((category, idx) => {
                 return (
-                  <Link key={idx} to={`/${category[0]}`} className={path === `/${category[0]}` ? "selected" : ""}>
+                  <Link
+                    key={idx}
+                    to={`/${category[0]}`}
+                    className={path === `/${category[0]}` ? "selected" : ""}
+                  >
                     {category[0]}({category[1]})
                   </Link>
-                );
+                )
               })}
             </nav>
           </div>
-        );
-      };
+        )
+      }
       //
       //
       //
       //
       class Form extends Component {
         constructor() {
-          super();
+          super()
           this.state = {
             url: "",
             category: "",
-            error: ""
-          };
-          this.create = this.create.bind(this);
+            error: "",
+          }
+          this.create = this.create.bind(this)
         }
         create() {
           this.props
-            .create({ url: this.state.url, category: this.state.category, error: this.state.error })
+            .create({
+              url: this.state.url,
+              category: this.state.category,
+              error: this.state.error,
+            })
             .then(() => {
-              this.props.history.push(`/${this.state.category.toUpperCase()}`);
-              this.setState({ url: "", category: "", error: "" });
+              this.props.history.push(`/${this.state.category.toUpperCase()}`)
+              this.setState({ url: "", category: "", error: "" })
             })
             .catch(ex => {
-              this.setState({ error: ex.message });
+              this.setState({ error: ex.message })
               setTimeout(() => {
-                this.setState({ error: "" });
-              }, 3000);
-            });
+                this.setState({ error: "" })
+              }, 3000)
+            })
         }
 
         render() {
-          const { url, category, error } = this.state;
-          const { create } = this;
+          const { url, category, error } = this.state
+          const { create } = this
           return (
             <form onSubmit={ev => ev.preventDefault()}>
               {!!error && <div className="error">{error}</div>}
-              <input value={url} placeholder="Url" onChange={ev => this.setState({ url: ev.target.value })} />
-              <input value={category} placeholder="Category" onChange={ev => this.setState({ category: ev.target.value })} />
+              <input
+                value={url}
+                placeholder="Url"
+                onChange={ev => this.setState({ url: ev.target.value })}
+              />
+              <input
+                value={category}
+                placeholder="Category"
+                onChange={ev => this.setState({ category: ev.target.value })}
+              />
               <button disabled={!url || !category} onClick={() => create()}>
                 <span className="create">Create</span>
               </button>
             </form>
-          );
+          )
         }
       }
       //
       //
       //
-      const Bookmarks = ({ path, bookmarks, categories, user, destroy, history }) => {
+      const Bookmarks = ({
+        path,
+        bookmarks,
+        categories,
+        user,
+        destroy,
+        history,
+      }) => {
         // return null;
 
         return (
@@ -114,83 +143,109 @@
                     <button
                       history={history}
                       onClick={function() {
-                        if (bookmarks.filter(bm => bm.category === bookmark.category).length === 1 && bookmarks.length > 0) {
-                          const firstCat = bookmarks[0].category.toUpperCase();
-                          history.push(`/${firstCat}`);
+                        if (
+                          bookmarks.filter(
+                            bm => bm.category === bookmark.category
+                          ).length === 1 &&
+                          bookmarks.length > 0
+                        ) {
+                          const firstCat = bookmarks[0].category.toUpperCase()
+                          history.push(`/${firstCat}`)
                         }
-                        return destroy(bookmark);
+                        return destroy(bookmark)
                       }}
                     >
                       <span className="destroy">Destroy</span>
                     </button>
                   </li>
-                );
+                )
               })}
           </ul>
-        );
-      };
+        )
+      }
       //
       //
       //
       class App extends Component {
         constructor() {
-          super();
+          super()
           this.state = {
             user: {},
-            bookmarks: []
-          };
-          this.create = this.create.bind(this);
-          this.destroy = this.destroy.bind(this);
+            bookmarks: [],
+          }
+          this.create = this.create.bind(this)
+          this.destroy = this.destroy.bind(this)
         }
         async componentDidMount() {
-          const user = await fetchUser();
-          const bookmarks = (await axios.get(`${API}/users/${user.id}/bookmarks`)).data;
-          this.setState({ user, bookmarks });
+          const user = await fetchUser()
+          const bookmarks = (
+            await axios.get(`${API}/users/${user.id}/bookmarks`)
+          ).data
+          this.setState({ user, bookmarks })
         }
         async create({ url, category, error }) {
           if (this.state.bookmarks.find(bm => bm.url === url)) {
-            const ex = new Error("That URL is already bookmarked!");
-            throw ex;
+            const ex = new Error("That URL is already bookmarked!")
+            throw ex
           }
           const created = (
             await axios.post(`${API}/users/${this.state.user.id}/bookmarks`, {
               url,
               category,
-              error
+              error,
             })
-          ).data;
-          const bookmarks = [...this.state.bookmarks, created];
-          this.setState({ bookmarks });
+          ).data
+          const bookmarks = [...this.state.bookmarks, created]
+          this.setState({ bookmarks })
         }
         async destroy(bookmark) {
-          await axios.delete(`${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`);
-          this.setState({ bookmarks: this.state.bookmarks.filter(bm => bm.id !== bookmark.id) });
+          await axios.delete(
+            `${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`
+          )
+          this.setState({
+            bookmarks: this.state.bookmarks.filter(bm => bm.id !== bookmark.id),
+          })
         }
         render() {
-          const { user, bookmarks } = this.state;
-          const { create, destroy } = this;
+          const { user, bookmarks } = this.state
+          const { create, destroy } = this
           const categories = Object.entries(
             bookmarks.reduce((acc, bookmark) => {
               if (acc[bookmark.category] !== undefined) {
-                acc[bookmark.category]++;
-                return acc;
+                acc[bookmark.category]++
+                return acc
               }
-              acc[bookmark.category] = 1;
-              return acc;
+              acc[bookmark.category] = 1
+              return acc
             }, {})
-          ).map(cat => [cat[0].toUpperCase(), cat[1]]);
+          ).map(cat => [cat[0].toUpperCase(), cat[1]])
 
           if (location.hash.slice(1) === "/" && bookmarks.length > 0) {
-            location.hash = `/${bookmarks[0].category.toUpperCase()}`;
+            location.hash = `/${bookmarks[0].category.toUpperCase()}`
           }
           return (
             <HashRouter>
               <Route
-                render={({ location }) => <Nav path={location.pathname} bookmarks={bookmarks} user={user} categories={categories} />}
+                render={({ location }) => (
+                  <Nav
+                    path={location.pathname}
+                    bookmarks={bookmarks}
+                    user={user}
+                    categories={categories}
+                  />
+                )}
               />
               <Route
                 render={({ history }) => {
-                  return <Form user={user} bookmarks={bookmarks} create={create} categories={categories} history={history} />;
+                  return (
+                    <Form
+                      user={user}
+                      bookmarks={bookmarks}
+                      create={create}
+                      categories={categories}
+                      history={history}
+                    />
+                  )
                 }}
               />
               <Route
@@ -204,17 +259,17 @@
                       categories={categories}
                       destroy={destroy}
                     />
-                  );
+                  )
                 }}
               />
             </HashRouter>
-          );
-          return null;
+          )
+          return null
         }
       }
 
-      const root = document.querySelector("#root");
-      ReactDOM.render(<App />, root);
+      const root = document.querySelector("#root")
+      ReactDOM.render(<App />, root)
     </script>
   </body>
 </html>
