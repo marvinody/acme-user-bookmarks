@@ -19,6 +19,12 @@ const fetchUser = async () => {
 }
 
 
+// this is like a mix between a generic helper function and a specific helper function
+// Trying giving it a better name
+// helperCountFunc. Well, I know it's a helper cause it doesn't do much else
+// and you gave the label above (I love that btw), and I can tell it's a func from
+// syntax.
+// it looks like this is unique count? Sometimes we call that frequency
 const helperCountFunc = (nav) => {
   let uniqueCount = []
   var count = {}
@@ -40,6 +46,8 @@ const { render } = ReactDOM
 const { Link, Redirect, Route, HashRouter, Switch } = ReactRouterDOM
 const root = document.getElementById('root')
 
+// sometimes when you grab stuff like this, it helps to just put a link to it as a comment
+// helps people know it's not your's and lets you know to not worry about debugging
 const Loading = () => {
   return (
     <section className="centerMe">
@@ -143,7 +151,8 @@ const Nav = (props) => {
   console.log(pathname)
   let navArray = helperCountFunc(bookMarks)
   let nav = []
-
+  // this works
+  // but may I interest you with a .map?
   for (const link in navArray) {
     //   console.log(link)
     nav.push(<li key={link}><Link className={`${pathname === link ? 'selected' : null}`} to={`/${link}`}>{`${link} (${navArray[link]})`}</Link></li>)
@@ -162,7 +171,7 @@ const Nav = (props) => {
         <h1>{fullName} ({numOfBookmakrs} {(bookMarks.length > 0) ? 'Bookmarks' : 'Bookmark'}) </h1>
         <ul className="nav" id="parent">
           {
-            nav.map(link => link)
+            nav.map(link => link) // this is a no-op. You could just do {nav} here
           }
         </ul>
       </nav>
@@ -207,12 +216,14 @@ class App extends Component {
     // console.log(user.id)
     // console.log(`https://${valOne}.com`);
     // console.log(valTwo);
+    // is it update or something else? Maybe a better name...
     const update = (await axios.post(`${API}/users/${user.id}/bookmarks`, {
       url: `https://www.${valOne}.com`,
       rating: 0,
       category: valTwo,
     })).data
     console.log(update)
+    // good concat
     this.setState({ bookMarks: this.state.bookMarks.concat(update) })
     // console.log(bookMarks);
   }
@@ -220,6 +231,7 @@ class App extends Component {
   async deleteOnChange(id) {
     const { user } = this.state
     console.log(this.state.user)
+    // good!
     await axios.delete(`${API}/users/${user.id}/bookmarks/${id}`)
     console.log(`${API}/users/${user.id}/bookmarks/${id}`)
     this.setState({ bookMarks: this.state.bookMarks.filter(_bookmark => _bookmark.id !== id) })
@@ -247,3 +259,8 @@ class App extends Component {
 }
 
 render(<App />, root)
+
+// While I don't mind too much,
+// Please try to remove console.logs
+// They will accumulate. Trust me
+// After you fix something, remove them AND commit!
