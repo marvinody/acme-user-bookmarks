@@ -14,7 +14,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.0/react-router-dom.js"></script>
 
     <style>
-
       h1 {
         display: flex;
         justify-content: space-around;
@@ -60,7 +59,6 @@
         padding: 1rem;
         margin: 1rem;
         border: solid 1px black;
-        
       }
     </style>
   </head>
@@ -69,41 +67,39 @@
     <div id="root"></div>
 
     <script type="text/babel">
-      const root = document.querySelector("#root");
-      const { render } = ReactDOM;
-      const { Component } = React;
-      const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM;
-      const API = "https://acme-users-api-rev.herokuapp.com/api";
+      const root = document.querySelector("#root")
+      const { render } = ReactDOM
+      const { Component } = React
+      const { HashRouter, Route, Link, Switch, Redirect } = ReactRouterDOM
+      const API = "https://acme-users-api-rev.herokuapp.com/api"
 
       const fetchUser = async () => {
-        const storage = window.localStorage;
-        const userId = storage.getItem("userId");
+        const storage = window.localStorage
+        const userId = storage.getItem("userId")
         if (userId) {
           try {
-            return (await axios.get(`${API}/users/detail/${userId}`)).data;
+            return (await axios.get(`${API}/users/detail/${userId}`)).data
           } catch (ex) {
-            storage.removeItem("userId");
-            return fetchUser();
+            storage.removeItem("userId")
+            return fetchUser()
           }
         }
-        const user = (await axios.get(`${API}/users/random`)).data;
-        storage.setItem("userId", user.id);
+        const user = (await axios.get(`${API}/users/random`)).data
+        storage.setItem("userId", user.id)
 
-        return user;
-      };
+        return user
+      }
 
       const Nav = ({ path, bookmarks, match }) => {
         let newsLength = bookmarks.reduce((acc, curr) => {
-          if (curr.category === "news") return acc++;
-        }, 0);
+          if (curr.category === "news") return acc++
+        }, 0)
         let shoppingLength = bookmarks.reduce((acc, curr) => {
-          if (curr.category === "shopping") return acc++;
-        }, 0);
+          if (curr.category === "shopping") return acc++
+        }, 0)
         let searchLength = bookmarks.reduce((acc, curr) => {
-          if (curr.category === "search") return acc++;
-        }, 0);
-
-
+          if (curr.category === "search") return acc++
+        }, 0)
 
         return (
           <nav>
@@ -122,48 +118,48 @@
               Search ({searchLength})
             </Link>
           </nav>
-        );
-      };
+        )
+      }
 
       const Bookmark = ({ bookmarks, match, destroy }) => {
-        console.log(match);
+        console.log(match)
         return (
           <main>
             <ul>
               {bookmarks
-              .filter(filt => filt.category === 'news')
-              .map((bookmark, idx) => (
-                <li key={idx}>
-                  {bookmark.url}
-                  <button onClick={() => destroy(bookmark)}>destroy</button>
-                </li>
-              ))}
+                .filter(filt => filt.category === "news")
+                .map((bookmark, idx) => (
+                  <li key={idx}>
+                    {bookmark.url}
+                    <button onClick={() => destroy(bookmark)}>destroy</button>
+                  </li>
+                ))}
             </ul>
           </main>
-        );
-      };
+        )
+      }
 
       class Create extends Component {
         constructor() {
-          super();
+          super()
           this.state = {
             url: "url",
-            category: "category"
-          };
-          this.create = this.create.bind(this);
+            category: "category",
+          }
+          this.create = this.create.bind(this)
         }
         create(history) {
           const bookmark = {
             url: this.state.url,
             category: this.state.category,
-            rating: 1
-          };
-          this.props.create(bookmark, history);
+            rating: 1,
+          }
+          this.props.create(bookmark, history)
         }
         render() {
-          const { bookmarks, history } = this.props;
-          const { url, category } = this.state;
-          const { create, destroy } = this;
+          const { bookmarks, history } = this.props
+          const { url, category } = this.state
+          const { create, destroy } = this
 
           return (
             <div className="container">
@@ -190,29 +186,29 @@
                 </button>
               </form>
             </div>
-          );
+          )
         }
       }
 
       class App extends Component {
         constructor() {
-          super();
+          super()
           this.state = {
             user: {},
             // notes: [],
-            bookmarks: []
-          };
-          this.update = this.update.bind(this);
-          this.create = this.create.bind(this);
-          this.destroy = this.destroy.bind(this);
+            bookmarks: [],
+          }
+          this.update = this.update.bind(this)
+          this.create = this.create.bind(this)
+          this.destroy = this.destroy.bind(this)
         }
 
         async componentDidMount() {
-          const user = await fetchUser();
+          const user = await fetchUser()
           const bookmarks = (
             await axios.get(`${API}/users/${user.id}/bookmarks`)
-          ).data;
-          this.setState({ bookmarks, user });
+          ).data
+          this.setState({ bookmarks, user })
         }
 
         async update(bookmark) {
@@ -220,25 +216,25 @@
             await axios.put(
               `${API}/users/${this.state.user.id}/bookmarks/${bookmarks.id}`
             )
-          ).data;
+          ).data
           this.setState({
             bookmarks: this.state.bookmarks.map(bookmark =>
               bookmark.id === updated.id ? updated : bookmark
-            )
-          });
+            ),
+          })
         }
 
         async destroy(bookmark) {
-          const { bookmarks } = this.state;
-          
+          const { bookmarks } = this.state
+
           await axios.delete(
             `${API}/users/${this.state.user.id}/bookmarks/${bookmark.id}`
-          );
+          )
           this.setState({
             bookmarks: this.state.bookmarks.filter(
               _bookmark => _bookmark.id !== bookmark.id
-            )
-          });
+            ),
+          })
         }
 
         async create(bookmark, history) {
@@ -247,14 +243,14 @@
               `${API}/users/${this.state.user.id}/bookmarks`,
               bookmark
             )
-          ).data;
-          this.setState({ bookmarks: [...this.state.bookmarks, created] });
-          history.push(bookmark.category);
+          ).data
+          this.setState({ bookmarks: [...this.state.bookmarks, created] })
+          history.push(bookmark.category)
         }
 
         render() {
-          const { bookmarks, user } = this.state;
-          const { update, create, destroy } = this;
+          const { bookmarks, user } = this.state
+          const { update, create, destroy } = this
 
           return (
             <HashRouter>
@@ -288,12 +284,10 @@
                       create={create}
                       bookmarks={bookmarks}
                       destroy={destroy}
-
                     />
                   )}
                 />
                 <Route
-                  
                   path="/shopping"
                   render={props => (
                     <Bookmark
@@ -307,7 +301,6 @@
                   )}
                 />
                 <Route
-                  
                   path="/search"
                   render={props => (
                     <Bookmark
@@ -323,11 +316,11 @@
                 )} />
               </Switch>
             </HashRouter>
-          );
+          )
         }
       }
 
-      render(<App />, root);
+      render(<App />, root)
     </script>
   </body>
 </html>
