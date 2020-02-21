@@ -92,17 +92,21 @@
         return user
       }
 
+      // be careful with this function
       // Fetches Bookmark Data
       const fetchBookmarks = async userId => {
         try {
           return (await axios.get(`${API}/users/${userId}/bookmarks`)).data
         } catch (ex) {
+          // if it fails because server down, it'll keep hitting it
+          // over and over...
           return fetchBookmarks()
         }
       }
 
       // Bookmark Component
       const Bookmarks = ({ bookmarks, destroy, match }) => {
+        // I like the way of doing this, pretty clean I think!
         const filter = match.params.filter
         let filtered = bookmarks.filter(
           bookmark => bookmark.category === filter
@@ -154,6 +158,9 @@
 
         create() {
           const { category, url } = this.state
+          // you double dipped on the history here
+          // const { history } = this.props
+          // may have worked here
           const { history } = this.props.history
           this.props
             .create({ category, url })
@@ -163,6 +170,9 @@
         render() {
           const { url, category } = this.state
           return (
+            // good on submit!
+            // just remember to do event.preventDefault!!
+            // also, why does this get history?
             <form onSubmit={this.create} history={history}>
               <input
                 type="text"
@@ -201,6 +211,10 @@
         async componentDidMount() {
           const user = await fetchUser()
           const bookmarks = await fetchBookmarks(user.id)
+          // so notice how you DERIVE categories from bookmarks?
+          // this generally means it shouldn't be in the state
+          // and should be generated in the render function
+          // making it derived means less bugs later
           const categories = this.state.categories
           bookmarks.filter(bookmark => {
             if (!categories.includes(bookmark.category)) {
@@ -211,6 +225,8 @@
         }
 
         async create(bookmark) {
+          // because here now, you'll need to update your categories
+          // (and because you forgot, you get bad ui)
           const bookmarkData = (
             await axios.post(
               `${API}/users/${this.state.user.id}/bookmarks/`,
@@ -230,12 +246,18 @@
               item => item.id !== bookmark.id
             ),
           })
+          // similar here too!
         }
 
         render() {
+          // but if you defined the categories here and derived them here
+          // they would just generate everytime your state changes!
+          // which means you get dynamic categories for free
           const { user, bookmarks, categories } = this.state
           const { create, destroy } = this
-
+          // while this works (putting everything under one route) FOR THIS CASE
+          // please don't do this normally
+          // use differernt routes for everything
           return (
             <HashRouter>
               <h1>{`${user.fullName} (${bookmarks.length}) Bookmark(s)`}</h1>
