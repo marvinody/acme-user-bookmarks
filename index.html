@@ -112,7 +112,9 @@
       const Nav = ({ bookmarks, match }) => {
         const filter = match.params.filter
         const categories = []
-
+        // hmmmm not using the return value of a filter
+        // this seems like a case forEach if you kept the same body
+        // however, this can be accomplished with a filter!
         bookmarks.filter(bookmark => {
           if (!categories.includes(bookmark.category)) {
             categories.push(bookmark.category)
@@ -209,14 +211,14 @@
             await axios.post(`${API}/users/${this.state.user.id}/bookmarks`, {
               category: bookmark.category,
               url: bookmark.url,
-              rating: 5,
+              rating: 5, // rating is optional but good
             })
           ).data
-
+          // perfect!
           this.setState({ bookmarks: [...this.state.bookmarks, created] })
           history.push(`/${created.category}`)
         }
-
+        // good
         async destroy(bookmark, history) {
           await axios.delete(
             `${API}/users/${this.state.user.id}/bookmarks/${bookmark}`
@@ -250,6 +252,7 @@
                   </div>
                 )}
               />
+              {/* seems funky to have a switch with a single thing here... */}
               <Switch>
                 <Route
                   exact
