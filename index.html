@@ -90,6 +90,8 @@
         return user
       }
 
+      // maybe puting your categories in an array and mapping over that
+      // would make it DRYer. worth a thought
       const Nav = ({ path, bookmarks, match }) => {
         let newsLength = bookmarks.reduce((acc, curr) => {
           if (curr.category === "news") return acc++
@@ -101,6 +103,7 @@
           if (curr.category === "search") return acc++
         }, 0)
 
+        // similar idea here
         return (
           <nav>
             <Link to="/news" className={path === "/news" ? "selected" : ""}>
@@ -127,6 +130,8 @@
           <main>
             <ul>
               {bookmarks
+                // hmm, hardcoded filter so you only ever show news
+                // good if you're NYT, but not good ux in other cases
                 .filter(filt => filt.category === "news")
                 .map((bookmark, idx) => (
                   <li key={idx}>
@@ -154,6 +159,8 @@
             category: this.state.category,
             rating: 1,
           }
+          // so here, you're passing history down
+          // but where are you getting it from?
           this.props.create(bookmark, history)
         }
         render() {
@@ -180,7 +187,9 @@
                 />
                 <button
                   disabled={bookmarks.length >= 10 ? true : false}
-                  onClick={() => create()}
+                  onClick={
+                    () => create() // because you're not passing history here!
+                  }
                 >
                   Create
                 </button>
@@ -217,13 +226,16 @@
               `${API}/users/${this.state.user.id}/bookmarks/${bookmarks.id}`
             )
           ).data
+          // great update! but we don't use it here
+          // make sure you copy paste relevant pieces to minimize your
+          // code base and keep it lean...
           this.setState({
             bookmarks: this.state.bookmarks.map(bookmark =>
               bookmark.id === updated.id ? updated : bookmark
             ),
           })
         }
-
+        // good destroy/creates
         async destroy(bookmark) {
           const { bookmarks } = this.state
 
